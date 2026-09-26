@@ -1,0 +1,395 @@
+/* Amazon — My Personal UX — injected at document_start via manifest (no FOUC). */
+
+/* ---- Custom Chips ---- */
+.az-chip {
+    display: inline-flex !important; align-items: center !important; gap: 4px !important;
+    font-weight: 700 !important; font-size: 13px !important;
+    border-radius: 6px !important; padding: 4px 10px !important;
+    margin: 6px 6px 6px 0 !important; line-height: 1.4 !important;
+    border: 2px solid transparent !important;
+}
+.az-chip-unit  { background: #e8f4ea !important; color: #125c2a !important; border-color: #9ecfae !important; }
+.az-chip-warn  { background: #fdf1e2 !important; color: #7a4a00 !important; border-color: #e2b16a !important; }
+.az-chip-good  { background: #e8f0fb !important; color: #123a6b !important; border-color: #9dbbe4 !important; }
+.az-note       { font-weight: 400 !important; opacity: 0.85 !important; font-size: 0.9em !important; }
+
+/* ---- Floating Action Button ---- */
+#az-fab {
+    position: fixed !important; right: 24px !important; bottom: 24px !important; z-index: 2147483000 !important;
+    width: 56px !important; height: 56px !important; border-radius: 50% !important;
+    background: linear-gradient(135deg, #0a7cff 0%, #6b21a8 100%) !important; color: #ffffff !important;
+    border: 3px solid #ffffff !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    font-size: 24px !important; display: flex !important; align-items: center !important; justify-content: center !important;
+    cursor: pointer !important; transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+#az-fab:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important; }
+#az-fab:focus-visible { outline: 4px solid #0a7cff !important; outline-offset: 3px !important; }
+
+/* ---- Settings Panel ---- */
+#az-panel {
+    position: fixed !important; right: 24px !important; bottom: 96px !important; z-index: 2147483000 !important;
+    width: 340px !important; max-height: calc(100vh - 120px) !important; overflow-y: auto !important;
+    background: #ffffff !important; color: #111111 !important;
+    border-radius: 12px !important; border: 2px solid #232f3e !important;
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35) !important;
+    padding: 20px !important; font-size: 16px !important; line-height: 1.5 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+    transform-origin: bottom right !important;
+}
+#az-panel[hidden] {
+    opacity: 0 !important; pointer-events: none !important; transform: scale(0.95) translateY(10px) !important;
+    display: block !important;
+}
+
+#az-panel h2 { font-size: 20px !important; margin: 0 0 16px !important; font-weight: 700 !important; color: #111 !important; }
+#az-panel h3 { font-size: 14px !important; margin: 16px 0 8px !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #555 !important; font-weight: 700 !important; }
+
+/* Tabs */
+.az-tabs { display: flex !important; gap: 8px !important; margin-bottom: 16px !important; border-bottom: 2px solid #eee !important; padding-bottom: 12px !important; }
+.az-tab { flex: 1 !important; padding: 10px !important; background: none !important; border: none !important; cursor: pointer !important; font-size: 15px !important; font-weight: 700 !important; color: #555 !important; text-align: center !important; border-radius: 6px !important; transition: all 0.2s !important; }
+.az-tab.active { color: #0a7cff !important; background: #f0f7ff !important; }
+.az-tab:hover:not(.active) { background: #f5f5f5 !important; }
+
+#az-panel label { display: flex !important; align-items: flex-start !important; gap: 12px !important; padding: 8px 0 !important; cursor: pointer !important; margin: 0 !important; }
+#az-panel input[type=checkbox], #az-panel input[type=radio] { width: 20px !important; height: 20px !important; margin: 3px 0 0 !important; flex: none !important; accent-color: #0a7cff !important; cursor: pointer !important; }
+
+.az-label-text { font-weight: 600 !important; color: #111 !important; display: block !important; margin-bottom: 2px !important; }
+#az-panel .az-hint { font-size: 13px !important; color: #555 !important; display: block !important; line-height: 1.4 !important; }
+
+.az-input { width: 100% !important; min-height: 44px !important; font-size: 15px !important; padding: 8px 12px !important; border: 2px solid #ccc !important; border-radius: 8px !important; box-sizing: border-box !important; background: #fff !important; color: #111 !important; margin-top: 8px !important; transition: border-color 0.2s !important; }
+.az-input:focus { outline: none !important; border-color: #0a7cff !important; }
+
+/* Cashback link block — third section of the in-page Modes view. */
+.az-aff-title { margin-top: 18px !important; border-top: 1px solid #eee !important; padding-top: 16px !important; }
+#az-aff-box { display: flex !important; flex-direction: column !important; gap: 6px !important; }
+#az-aff-box .az-aff-state { font-weight: 800 !important; font-size: 15px !important; padding: 9px 13px !important; border-radius: 8px !important; border: 2px solid !important; word-break: break-word !important; }
+#az-aff-box .az-aff-on { background: #e7f6ec !important; color: #10592b !important; border-color: #a8dcbb !important; }
+#az-aff-box .az-aff-off { background: #fdeaea !important; color: #96201a !important; border-color: #f0b6b2 !important; }
+#az-aff-box .az-aff-unsure { background: #eef1fb !important; color: #33408c !important; border-color: #bcc5ee !important; }
+#az-aff-box .az-aff-links { display: flex !important; gap: 8px !important; flex-wrap: wrap !important; margin-top: 2px !important; }
+#az-aff-box .az-aff-link { flex: 1 1 auto !important; text-align: center !important; padding: 9px 13px !important; border: 2px solid #0a7cff !important; border-radius: 8px !important; color: #0a7cff !important; font-weight: 700 !important; text-decoration: none !important; font-size: 14px !important; }
+#az-aff-box .az-aff-link:hover { background: #f0f7ff !important; }
+
+.az-foot { margin-top: 20px !important; font-size: 13px !important; color: #555 !important; border-top: 1px solid #eee !important; padding-top: 16px !important; text-align: center !important; }
+#az-panel, #az-panel * { text-shadow: none !important; }
+
+html[data-az="simple"] #nav-link-accountList { display: none !important; }
+
+#az-account-wrap {
+    position: relative !important; display: inline-flex !important; align-items: center !important;
+    height: 100% !important; margin: 0 4px 0 0 !important; z-index: 2147483001 !important;
+}
+#az-account-btn {
+    display: flex !important; align-items: center !important; gap: 8px !important;
+    height: 44px !important; padding: 0 16px !important;
+    background: transparent !important; color: #ffffff !important; border: 1px solid transparent !important;
+    border-radius: 6px !important; font-weight: 700 !important; font-size: 19px !important;
+    line-height: 1.2 !important; white-space: nowrap !important;
+    cursor: pointer !important; text-decoration: none !important;
+    font-family: inherit !important; transition: all 0.2s !important;
+}
+#az-account-greeting { white-space: nowrap !important; }
+#az-account-btn:hover, #az-account-wrap:hover #az-account-btn {
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+.az-arrow { font-size: 10px !important; opacity: 0.7 !important; transition: transform 0.2s !important; }
+#az-account-wrap:hover .az-arrow { transform: rotate(180deg) !important; }
+
+.az-dropdown {
+    position: absolute !important; top: 100% !important; right: 0 !important;
+    width: 240px !important; background: #ffffff !important; border-radius: 8px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important; border: 1px solid #e5e7eb !important;
+    opacity: 0 !important; visibility: hidden !important; transform: translateY(10px) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    padding: 8px 0 !important;
+}
+#az-account-wrap:hover .az-dropdown {
+    opacity: 1 !important; visibility: visible !important; transform: translateY(4px) !important;
+}
+.az-dropdown-title {
+    padding: 8px 16px !important; font-size: 12px !important; font-weight: 700 !important;
+    color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important;
+}
+.az-dropdown a {
+    display: block !important; padding: 10px 16px !important; font-size: 14px !important;
+    color: #111827 !important; text-decoration: none !important;
+    transition: background 0.15s !important;
+}
+.az-dropdown a:hover { background: #f3f4f6 !important; color: #0a7cff !important; }
+.az-divider { height: 1px !important; background: #e5e7eb !important; margin: 8px 0 !important; }
+
+/* Wishlist rows: name on the left, heart (default list) and lock/unlock
+   (private / shared) as icons on the right instead of trailing words. */
+.az-dropdown a.az-wl { display: flex !important; align-items: center !important; gap: 8px !important; }
+.az-wl-name { flex: 1 1 auto !important; min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+.az-wl-icon { flex: none !important; opacity: 0.55 !important; }
+.az-wl-default { color: #e25555 !important; opacity: 0.9 !important; }
+.az-dropdown { width: 280px !important; }
+
+/* The default wish list — the one Amazon adds to unless told otherwise. */
+.az-dropdown a.az-wl-is-default { background: #fdeaf1 !important; }
+.az-dropdown a.az-wl-is-default:hover { background: #fbdae8 !important; }
+
+/* Pastel rows for the store links that have their own identity. */
+.az-dropdown a.az-row-fresh { background: #e6f6ec !important; }
+.az-dropdown a.az-row-fresh:hover { background: #d3efdd !important; }
+.az-dropdown a.az-row-now { background: #e6f0fd !important; }
+.az-dropdown a.az-row-now:hover { background: #d3e4fb !important; }
+.az-dropdown a.az-row-meat { background: #fdeaea !important; }
+.az-dropdown a.az-row-meat:hover { background: #fbd8d8 !important; }
+.az-dropdown a.az-row-pay { background: #fdf6e0 !important; }
+.az-dropdown a.az-row-pay:hover { background: #fbeec5 !important; }
+
+/* NOTE (v3.2.0): "Power" mode was removed. It was Simple minus a handful of
+   rules, which made the two modes indistinguishable in practice. Everything
+   Power did now lives in Simple; the only modes are Simple and Off. */
+
+html[data-az="simple"] :focus-visible { outline: 3px solid #0a7cff !important; outline-offset: 2px !important; }
+
+html[data-az="simple"] .az-sponsored { display: none !important; }
+
+/* NOTE (v3.1.0): all font-size / button-size overrides of Amazon's own
+   elements were removed — they broke buy-box padding and clipped prices.
+   Font tweaks now apply only to our own UI (Explore & Account menus). */
+html[data-az="simple"] .a-color-secondary, html[data-az="simple"] .a-color-tertiary { color: #3d4142 !important; }
+
+/* v3.3.0: the one-result-per-row search layout was removed. It fought Amazon's
+   own grid and broke the results page; Amazon's native grid is left alone. */
+
+/* Search-page ad blocks (bottom AdHolder strips, left/right skyscrapers).
+   Driven by the "Hide sponsored results" toggle via data-az-ads. */
+html[data-az-ads="hide"] .s-result-item.AdHolder,
+html[data-az-ads="hide"] [data-cel-widget*="advertising"],
+html[data-az-ads="hide"] [cel_widget_id*="advertising"],
+html[data-az-ads="hide"] [cel_widget_id*="adPlacements"],
+html[data-az-ads="hide"] [cel_widget_id*="skyscraper"] { display: none !important; }
+
+html[data-az="simple"] .az-declutter,
+html[data-az="simple"] .az-video,
+html[data-az="simple"] .az-brands,
+html[data-az="simple"] .az-feedback { display: none !important; }
+
+/* Bigger buy-box price. Deliberately scoped to the price display only — the
+   v3.1.0 lesson was that broad font overrides break Amazon's buy-box padding.
+   v3.4.0: the currency symbol is kept small and given its own gap; sizing it up
+   with the digits made it collide with the number. */
+html[data-az="simple"][data-az-price="big"] #corePriceDisplay_desktop_feature_div .priceToPay .a-price-whole,
+html[data-az="simple"][data-az-price="big"] #corePriceDisplay_desktop_feature_div .a-price.aok-align-center .a-price-whole {
+    font-size: 44px !important; line-height: 1.15 !important; font-weight: 600 !important;
+}
+html[data-az="simple"][data-az-price="big"] #corePriceDisplay_desktop_feature_div .priceToPay .a-price-symbol,
+html[data-az="simple"][data-az-price="big"] #corePriceDisplay_desktop_feature_div .a-price.aok-align-center .a-price-symbol {
+    font-size: 22px !important; top: -0.65em !important; margin-right: 3px !important;
+}
+html[data-az="simple"][data-az-price="big"] #corePriceDisplay_desktop_feature_div .priceToPay .a-price-fraction {
+    font-size: 20px !important;
+}
+html[data-az="simple"][data-az-price="big"] #corePriceDisplay_desktop_feature_div .savingsPercentage {
+    font-size: 26px !important; font-weight: 700 !important; margin-right: 10px !important;
+}
+/* Breathing room so the enlarged price never touches the deal badge above or
+   the M.R.P. line below. */
+html[data-az="simple"][data-az-price="big"] #corePriceDisplay_desktop_feature_div {
+    padding: 10px 0 6px !important;
+}
+html[data-az="simple"][data-az-price="big"] #corePriceDisplay_desktop_feature_div .priceToPay {
+    display: inline-block !important; padding: 2px 0 !important;
+}
+html[data-az="simple"] #rhf, html[data-az="simple"] #navFooter, html[data-az="simple"] #dp-ads-center-promo_feature_div, html[data-az="simple"] [data-cel-widget^="sp_detail"], html[data-az="simple"] [data-cel-widget^="adplacements"] { display: none !important; }
+
+/* Buy-box clutter.
+   IMPORTANT: we deliberately do NOT hide the whole
+   div#apex_desktop > div > div[data-csa-c-slot-id="apex_dp_center_column"]
+   slot any more (v3.2.0). That wrapper holds the actual price, the deal
+   badge and the buy box — nuking it removed the entire pricing block. Only
+   the individual junk rows inside it are hidden now. */
+html[data-az="simple"] #dynamicGiftWrapInfoFeature_feature_div,
+html[data-az="simple"] #dynamicSecureTransactionFeature_feature_div,
+html[data-az="simple"] #b2bUpsell_feature_div,
+html[data-az="simple"] #buyItOnAB_feature_div,
+html[data-az="simple"] #dpx-nice-widget-container,
+html[data-az="simple"] #dpx-rex-nice-widget-container,
+html[data-az="simple"] #deliveryPriceBadging_feature_div,
+html[data-az="simple"] #vatMessage_feature_div,
+html[data-az="simple"] #rufus-price-ingress-cc,
+html[data-az="simple"] #itembox-Partner,
+html[data-az="simple"] #aplus_feature_div { display: none !important; }
+
+/* Hide clutter elements */
+html[data-az="simple"] #nav-global-location-popover-link { display: none !important; }
+html[data-az="simple"] #icp-nav-flyout { display: none !important; }
+html[data-az="simple"] #nav-subnav { display: none !important; }
+html[data-az="simple"] #nav-flyout-groceries { display: none !important; }
+
+html[data-az="simple"] #similarities_feature_div, html[data-az="simple"] #sims-consolidated-2_feature_div, html[data-az="simple"] #sims-consolidated-3_feature_div, html[data-az="simple"] #HLCXComparisonWidget_feature_div, html[data-az="simple"] #va-related-videos-widget_feature_div, html[data-az="simple"] #relatedVideoBySameAuthor_feature_div, html[data-az="simple"] #ask-btf_feature_div, html[data-az="simple"] #brandsSpotlight_feature_div, html[data-az="simple"] #vse-related-videos-btf_feature_div, html[data-az="simple"] #gw-desktop-herotator, html[data-az="simple"] #desktop-banner, html[data-az="simple"] .nav-fill .nav-left .nav-a-2, html[data-az="simple"] #nav-xshop-container { display: none !important; }
+
+html[data-az="simple"] .az-urgency { display: none !important; }
+html[data-az="simple"] .az-emi { display: none !important; }
+html[data-az="simple"] #inemi_feature_div { display: none !important; }
+
+/* Cashback banner. One line tall by design — the per-item breakdown lives in a
+   dropdown so it never obstructs the page. */
+#az-cashback { position: sticky !important; top: 0 !important; z-index: 2147482000 !important; padding: 10px 14px !important; font-size: 14px !important; font-weight: 600 !important; display: flex !important; align-items: center !important; gap: 12px !important; border-bottom: 1px solid rgba(0,0,0,.1) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important; }
+#az-cashback .az-cb-msg { flex: 1 1 auto !important; min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+#az-cashback .az-cb-actions { flex: none !important; display: flex !important; align-items: center !important; gap: 8px !important; }
+
+#az-cashback.az-live { background: #e8f4ea !important; color: #125c2a !important; }
+#az-cashback.az-stale { background: #fdf1e2 !important; color: #7a4a00 !important; }
+#az-cashback.az-all  { background: #e7f6ec !important; color: #10592b !important; }
+#az-cashback.az-some { background: #fdf6e0 !important; color: #7a5300 !important; }
+#az-cashback.az-none { background: #fdeaea !important; color: #96201a !important; }
+/* "We cannot vouch for this" — the browser restarted since the session began. */
+#az-cashback.az-unsure { background: #eef1fb !important; color: #33408c !important; }
+
+#az-cashback a { color: inherit !important; text-decoration: underline !important; }
+#az-cashback button { min-height: 32px !important; padding: 0 14px !important; cursor: pointer !important; border: 1px solid currentColor !important; border-radius: 6px !important; background: transparent !important; color: inherit !important; font-weight: 600 !important; font-size: 13px !important; transition: background 0.2s !important; }
+#az-cashback button:hover { background: rgba(0,0,0,0.06) !important; }
+#az-cashback .az-cb-close { min-width: 32px !important; padding: 0 8px !important; font-size: 15px !important; line-height: 1 !important; }
+
+#az-cashback .az-cb-details { position: relative !important; }
+#az-cashback .az-cb-details summary { list-style: none !important; cursor: pointer !important; padding: 6px 12px !important; border: 1px solid currentColor !important; border-radius: 6px !important; font-size: 13px !important; white-space: nowrap !important; }
+#az-cashback .az-cb-details summary::-webkit-details-marker { display: none !important; }
+#az-cashback .az-cb-list { position: absolute !important; top: calc(100% + 6px) !important; right: 0 !important; width: 380px !important; max-height: 340px !important; overflow-y: auto !important; background: #fff !important; color: #1f2937 !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important; box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important; padding: 8px 0 !important; z-index: 2147482100 !important; }
+#az-cashback .az-cb-group { padding: 8px 14px 4px !important; font-size: 11px !important; font-weight: 800 !important; text-transform: uppercase !important; letter-spacing: .05em !important; color: #6b7280 !important; }
+#az-cashback .az-cb-item { padding: 6px 14px !important; font-size: 13px !important; font-weight: 500 !important; line-height: 1.35 !important; border-left: 4px solid transparent !important; }
+#az-cashback .az-cb-item.az-cb-miss { border-left-color: #e0645c !important; background: #fdf5f5 !important; }
+#az-cashback .az-cb-item.az-cb-hit { border-left-color: #35a35f !important; background: #f5fbf7 !important; }
+#az-cashback .az-cb-item.az-cb-unsure { border-left-color: #6f7fd4 !important; background: #f5f6fd !important; }
+
+/* At-a-glance affiliate state, parked beside the settings button. */
+#az-aff-pill { position: fixed !important; right: 84px !important; bottom: 30px !important; z-index: 2147483000 !important; padding: 8px 14px !important; border-radius: 999px !important; font-size: 13px !important; font-weight: 800 !important; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; white-space: nowrap !important; box-shadow: 0 4px 14px rgba(0,0,0,0.15) !important; cursor: pointer !important; }
+#az-aff-pill:focus-visible { outline: 3px solid #0a7cff !important; outline-offset: 2px !important; }
+#az-aff-pill.az-pill-on { background: #e7f6ec !important; color: #10592b !important; border: 2px solid #a8dcbb !important; }
+#az-aff-pill.az-pill-off { background: #fdeaea !important; color: #96201a !important; border: 2px solid #f0b6b2 !important; }
+#az-aff-pill.az-pill-unsure { background: #eef1fb !important; color: #33408c !important; border: 2px solid #bcc5ee !important; }
+
+/* Our own action buttons (price history, jump to reviews) sit in one row. */
+#az-actions { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; margin: 12px 0 !important; }
+#az-actions:empty { display: none !important; }
+
+#az-pricehistory, #az-reviews { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; margin: 0 !important; min-height: 46px !important; padding: 0 20px !important; background: #232f3e !important; color: #fff !important; border: none !important; border-radius: 8px !important; font-size: 15px !important; font-weight: 700 !important; cursor: pointer !important; transition: all 0.2s !important; text-align: center !important; }
+#az-pricehistory:hover, #az-reviews:hover { background: #37475a !important; }
+
+/* Price-tracker pair — two equal buttons side by side, each in its own brand
+   colour. PriceHistory's purple/green are taken from their own logo SVG;
+   Keepa's orange is approximated (their assets block cross-origin reads). */
+#az-history-row { display: flex !important; gap: 8px !important; width: 100% !important; }
+#az-history-row button { flex: 1 1 0 !important; }
+
+#az-pricehistory { background: #ff8c00 !important; color: #1c1c1c !important; border: 2px solid #e07b00 !important; font-size: 15px !important; }
+#az-pricehistory:hover { background: #ffa333 !important; }
+
+#az-pricehistory-alt { display: inline-flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; min-height: 46px !important; padding: 0 16px !important; background: #5237a5 !important; color: #fff !important; border: 2px solid #50cc00 !important; border-radius: 8px !important; font-size: 15px !important; font-weight: 700 !important; cursor: pointer !important; transition: all 0.2s !important; }
+#az-pricehistory-alt:hover { background: #6446c4 !important; }
+
+/* Reviews button — three lines:
+     1. "Check Review Section"  (the action, most prominent)
+     2. rating + five stars
+     3. review count + "global reviews"
+   Pastel amber rather than navy: dark text on a light field is far easier to
+   read, and the warm tone ties it to the star rating. */
+#az-reviews { flex-direction: column !important; align-items: center !important; gap: 4px !important; min-height: 76px !important; padding: 12px 24px !important; width: 100% !important; background: #fff6e5 !important; color: #1f2937 !important; border: 2px solid #ffc46b !important; }
+#az-reviews:hover { background: #ffefd2 !important; border-color: #f0a92e !important; }
+#az-reviews .az-btn-main { font-size: 20px !important; font-weight: 800 !important; line-height: 1.2 !important; color: #1f2937 !important; }
+
+#az-reviews .az-btn-rating { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; line-height: 1.1 !important; }
+#az-reviews .az-btn-rating:empty, #az-reviews .az-btn-count:empty { display: none !important; }
+#az-reviews .az-rating-value { font-size: 18px !important; font-weight: 800 !important; color: #7a4a00 !important; }
+#az-reviews .az-rating-stars { display: inline-flex !important; align-items: center !important; gap: 1px !important; }
+#az-reviews .az-star { width: 15px !important; height: 15px !important; }
+#az-reviews .az-star-on { color: #e8930c !important; }
+#az-reviews .az-star-off { color: #d9c7a6 !important; }
+
+#az-reviews .az-btn-count { font-size: 12px !important; font-weight: 600 !important; color: #55606e !important; line-height: 1.2 !important; }
+#az-reviews .az-count-value { font-size: 15px !important; font-weight: 800 !important; color: #1f2937 !important; }
+
+/* Extra-fees warning. Shown inline beside the price and under the price block. */
+.az-chip-fee { display: inline-block !important; padding: 4px 10px !important; background: #fdecea !important; color: #b3261e !important; border: 1px solid #f4c7c3 !important; border-radius: 6px !important; font-size: 14px !important; font-weight: 700 !important; line-height: 1.3 !important; }
+.az-chip-fee.az-fee-inline { margin: 0 0 0 10px !important; vertical-align: middle !important; }
+.az-chip-fee.az-fee-block { margin: 8px 0 0 !important; }
+
+/* Coupons are deliberately easy to miss — outline them.
+   Works for all three variants Amazon uses: the "Apply ₹x coupon" checkbox, the
+   newer "Collect Coupon" link, and the cart-page promotion box. */
+.az-coupon { display: inline-block !important; padding: 10px 14px !important; margin: 4px 0 !important; border: 3px solid #067d3d !important; border-radius: 10px !important; background: #eaf7ef !important; box-shadow: 0 0 0 3px rgba(6,125,61,0.12) !important; }
+.az-coupon, .az-coupon span, .az-coupon label, .az-coupon div { font-size: 16px !important; font-weight: 700 !important; color: #0d5c2e !important; line-height: 1.45 !important; }
+.az-coupon a, .az-coupon a span { color: #0a6ebd !important; font-size: 16px !important; text-decoration: underline !important; }
+.az-coupon input[type=checkbox] { width: 22px !important; height: 22px !important; accent-color: #067d3d !important; cursor: pointer !important; }
+.az-coupon.az-coupon-auto { border-color: #0a8f47 !important; background: #ddf3e6 !important; }
+
+/* Cart charges. Amazon prints "₹64.96 delivery Thu, 13 Aug" in the same size and
+   weight as everything around it, so the amount reads as part of the date. Pastel
+   red, larger, bolder — the font family is left alone. */
+.az-cart-fee { font-size: 16px !important; font-weight: 800 !important; line-height: 1.4 !important; color: #96201a !important; background: #fdeaea !important; border: 2px solid #f0b6b2 !important; border-radius: 8px !important; padding: 3px 10px !important; margin: 2px 0 !important; }
+.az-cart-fee *, .az-cart-fee .a-text-bold, .az-cart-fee .a-color-base, .az-cart-fee .a-color-success { color: #96201a !important; font-size: 16px !important; font-weight: 800 !important; }
+
+/* Paints over the white gutter beside the nav bar when the cart rail is hidden,
+   so the top bar reads as continuous rather than cut off. `top` is set inline by
+   navGutterPatch() from the belt's measured position — the cashback banner sits
+   above the belt and moves it, so a fixed top: 0 here would drift. */
+#az-nav-patch { position: absolute !important; right: 0 !important; z-index: 2147481900 !important; pointer-events: none !important; }
+
+/* Cart rail.
+   v3.3.0: we used to also zero the right padding Amazon reserves for the rail.
+   That reclaimed the gutter but shifted the entire page right on every toggle.
+   Now we only hide the rail and leave Amazon's reserved gutter in place, so
+   nothing reflows — the gap simply shows the page background, and the dark nav
+   bar still paints across it because that space is padding *inside* the belt.
+
+   v3.7.0: we also used to force #a-page to #fff so the exposed gutter had a
+   colour. That was wrong on any page Amazon paints grey — the cart, most
+   obviously — where it left a white stripe down the right edge. Leaving
+   #a-page's own background alone makes the gutter match the page by
+   definition, white on a product page and grey on the cart. */
+html[data-az-ewc="closed"] #nav-flyout-ewc { display: none !important; }
+
+#az-ewc-toggle { position: fixed !important; top: 42% !important; right: 0 !important; z-index: 2147482900 !important; min-width: 48px !important; min-height: 52px !important; padding: 0 16px !important; background: #232f3e !important; color: #fff !important; border: 2px solid #fff !important; border-right: none !important; border-radius: 12px 0 0 12px !important; box-shadow: -4px 4px 12px rgba(0,0,0,.15) !important; font-size: 18px !important; font-weight: 700 !important; cursor: pointer !important; transition: right .2s cubic-bezier(0.16, 1, 0.3, 1) !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; }
+#az-ewc-toggle:focus-visible { outline: 4px solid #0a7cff !important; outline-offset: 2px !important; }
+
+html[data-az-nav="min"] #nav-main { display: none !important; }
+
+/* ---- Custom Explore Nav ---- */
+#az-nav-wrap {
+    position: relative !important; display: inline-flex !important; align-items: center !important;
+    height: 100% !important; margin: 0 2px 0 10px !important; z-index: 2147483001 !important;
+}
+#az-nav-btn {
+    display: flex !important; align-items: center !important; gap: 4px !important;
+    height: 38px !important; padding: 0 12px !important;
+    background: transparent !important; color: #ffffff !important; border: 1px solid transparent !important;
+    border-radius: 4px !important; font-weight: 700 !important; font-size: 16px !important;
+    cursor: pointer !important; text-decoration: none !important;
+    font-family: inherit !important; transition: all 0.2s !important;
+}
+
+/* Larger explore button in simple mode */
+html[data-az="simple"] #az-nav-btn {
+    height: 44px !important; padding: 0 16px !important; font-size: 18px !important;
+}
+
+/* Explore sits at the far LEFT of the nav — anchor its dropdown left so it
+   never extends off-screen (the shared .az-dropdown default is right: 0). */
+#az-nav-wrap .az-dropdown { left: 0 !important; right: auto !important; }
+
+#az-nav-btn:hover, #az-nav-wrap:hover #az-nav-btn { border-color: rgba(255, 255, 255, 0.4) !important; }
+#az-nav-wrap:hover .az-arrow { transform: rotate(180deg) !important; }
+#az-nav-wrap:hover .az-dropdown { opacity: 1 !important; visibility: visible !important; transform: translateY(4px) !important; }
+
+/* Increase font size in simple mode for the dropdowns */
+html[data-az="simple"] .az-dropdown a { font-size: 16px !important; padding: 12px 18px !important; }
+html[data-az="simple"] .az-dropdown-title { font-size: 13px !important; padding: 12px 18px !important; }
+html[data-az="simple"] .az-dropdown { width: 300px !important; }
+
+.az-dot { display: inline-block !important; width: 10px !important; height: 10px !important; border-radius: 50% !important; margin-right: 12px !important; box-shadow: 0 0 0 1px rgba(0,0,0,0.1) inset !important; }
+.az-dot-fresh { background: #10b981 !important; }
+.az-dot-deals { background: #f59e0b !important; }
+.az-dot-pay { background: #3b82f6 !important; }
+.az-dot-bestsellers { background: #ec4899 !important; }
+.az-dot-mini { background: #8b5cf6 !important; }
+.az-dot-sell { background: #64748b !important; }
+.az-dot-now { background: #ef4444 !important; }
+.az-dot-meat { background: #9f1239 !important; }
+.az-dot-video { background: #0ea5e9 !important; }
+.az-dot-music { background: #f43f5e !important; }
+.az-dot-new { background: #14b8a6 !important; }

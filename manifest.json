@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Amazon - My Personal UX",
+  "version": "3.7.0",
+  "description": "Declutters Amazon, strips dark patterns, warns about extra fees, adds price-per-unit, seller badges, bank offers, and a refined navigation experience.",
+  "author": "Sandeep Kiran (Mousy)",
+  "permissions": ["storage"],
+  "host_permissions": [],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Amazon - My Personal UX",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.amazon.in/*", "https://www.amazon.com/*"],
+      "exclude_matches": ["https://www.amazon.in/ap/*", "https://www.amazon.com/ap/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "amazon-gemini@sandeep.local",
+      "strict_min_version": "121.0"
+    }
+  }
+}
