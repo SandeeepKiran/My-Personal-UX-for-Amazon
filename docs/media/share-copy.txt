@@ -1,0 +1,24 @@
+LINKEDIN / LONG POST
+--------------------
+Amazon is loud. "Only 3 left!", sponsored results, EMI upsells, and a ₹40 delivery fee in small print.
+
+So I built a browser extension that makes it calm and honest:
+• Shows extra fees next to the price, and makes cart delivery charges hard to miss
+• Price per 100 g / 100 ml in search, so pack sizes compare fairly
+• Hides sponsored results, urgency text and recommendation rails
+• Auto-applies coupons, adds Keepa / price-history and reviews buttons
+• Tells you which cart items a cashback link actually tracks
+
+Version 5.0.0 now runs on Chrome, Edge and Firefox. 24 settings, grouped by the part of Amazon they change. No data leaves your browser; the only permission is storage.
+
+As a QA engineer, I shipped it with 11 automated Playwright tests — which caught a real re-render loop and a unit-price bug from the old version.
+
+Made with ❤️ by Mousy!
+
+SHORT (X / Bluesky)
+-------------------
+Amazon is loud. My extension makes it calm: real fees next to the price, unit prices in search, no sponsored clutter, coupons applied for you. v5.0 — Chrome, Edge, Firefox. Made with ❤️ by Mousy!
+
+VIDEO CAPTION
+-------------
+One click. A calm Amazon. — Amazon: My Personal UX v5.0.0

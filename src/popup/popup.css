@@ -1,0 +1,86 @@
+/* My Personal UX for Amazon: toolbar popup.
+   settings.js makes the az- elements. content.css has the same look for the page panel. */
+
+* { box-sizing: border-box; }
+
+body {
+    width: 360px;
+    margin: 0;
+    padding: 14px 14px 10px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #111;
+    background: #fff;
+}
+
+header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+header img { border-radius: 6px; }
+h1 { font-size: 17px; font-weight: 700; margin: 0; }
+h3 { font-size: 12px; margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.05em; color: #555; }
+
+/* Browsers limit a popup to about 600 px high. Only the content area scrolls. */
+main { max-height: 440px; overflow-y: auto; padding-right: 2px; }
+
+/* ---- Tabs ---- */
+.az-tabs { display: flex; gap: 8px; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+.az-tab { flex: 1; padding: 7px; background: none; border: none; cursor: pointer; font: inherit; font-weight: 700; color: #555; border-radius: 6px; }
+.az-tab.active { color: #0a7cff; background: #f0f7ff; }
+.az-tab:hover:not(.active) { background: #f5f5f5; }
+.az-tab:focus-visible { outline: 3px solid #0a7cff; outline-offset: 1px; }
+
+/* ---- Text ---- */
+.az-toggle-text { flex: 1 1 auto; min-width: 0; }
+.az-label-text { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-weight: 600; }
+.az-hint { display: block; font-size: 12px; color: #555; line-height: 1.4; }
+.az-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #7a4a00; background: #fdf1e2; border: 1px solid #e2b16a; border-radius: 999px; padding: 0 6px; }
+
+/* ---- Modes ---- */
+.az-mode { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; cursor: pointer; }
+.az-radio { width: 18px; height: 18px; margin: 2px 0 0; flex: none; accent-color: #0a7cff; cursor: pointer; }
+
+/* ---- Setting groups ---- */
+.az-group { border: 1px solid #e5e7eb; border-radius: 10px; margin: 0 0 8px; background: #fafbfc; }
+.az-group-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; list-style: none; font-weight: 700; font-size: 13px; border-radius: 10px; }
+.az-group-head::-webkit-details-marker { display: none; }
+.az-group-head::after { content: "▸"; color: #6b7280; transition: transform 0.15s; }
+.az-group[open] > .az-group-head::after { transform: rotate(90deg); }
+.az-group-head:hover { background: #f0f2f5; }
+.az-group-head:focus-visible { outline: 3px solid #0a7cff; outline-offset: 1px; }
+.az-group-icon { font-size: 15px; }
+.az-group-title { flex: 1 1 auto; }
+.az-group-count { font-size: 11px; font-weight: 700; color: #0a5bc4; background: #e6f0fd; border-radius: 999px; padding: 1px 8px; }
+.az-group-count.az-none-on { color: #6b7280; background: #eef0f3; }
+.az-group-body { padding: 0 10px 6px; background: #fff; border-top: 1px solid #eef0f3; border-radius: 0 0 10px 10px; }
+
+.az-toggle { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; cursor: pointer; border-bottom: 1px solid #f1f2f4; }
+.az-toggle:last-child { border-bottom: none; }
+.az-toggle.az-blocked { opacity: 0.55; cursor: not-allowed; }
+
+/* A checkbox that looks like an on/off switch. */
+.az-switch { appearance: none; -webkit-appearance: none; position: relative; flex: none; width: 34px; height: 20px; margin: 2px 0 0; border-radius: 999px; background: #cbd5e1; cursor: pointer; transition: background 0.15s; }
+.az-switch::before { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); transition: transform 0.15s; }
+.az-switch:checked { background: #0a7cff; }
+.az-switch:checked::before { transform: translateX(14px); }
+.az-switch:focus-visible { outline: 3px solid #0a7cff; outline-offset: 2px; }
+.az-switch:disabled { cursor: not-allowed; }
+
+.az-cards { padding: 8px 0 4px; }
+.az-input { width: 100%; min-height: 36px; font: inherit; padding: 6px 10px; border: 2px solid #ccc; border-radius: 8px; margin-top: 6px; }
+.az-input:focus { outline: none; border-color: #0a7cff; }
+
+/* ---- Cashback link ---- */
+.az-aff-title { margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px; }
+#affiliate { display: flex; flex-direction: column; gap: 6px; }
+.az-aff-state { font-weight: 800; padding: 8px 12px; border-radius: 8px; border: 2px solid; word-break: break-word; }
+.az-aff-on { background: #e7f6ec; color: #10592b; border-color: #a8dcbb; }
+.az-aff-off { background: #fdeaea; color: #96201a; border-color: #f0b6b2; }
+.az-aff-unsure { background: #eef1fb; color: #33408c; border-color: #bcc5ee; }
+.az-aff-links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.az-aff-link { flex: 1 1 auto; text-align: center; padding: 7px 12px; border: 2px solid #0a7cff; border-radius: 8px; color: #0a7cff; font-weight: 700; text-decoration: none; font-size: 13px; }
+.az-aff-link:hover { background: #f0f7ff; }
+.az-aff-link:focus-visible { outline: 3px solid #0a7cff; outline-offset: 2px; }
+
+/* ---- Footer ---- */
+.az-foot { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #eee; font-size: 12px; color: #555; }
+.az-version { font-weight: 600; }

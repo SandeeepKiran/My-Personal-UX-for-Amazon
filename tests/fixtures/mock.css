@@ -1,0 +1,78 @@
+/* Test pages: a small copy of the Amazon layout.
+   The element ids are the same ids that the content scripts look for. */
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Amazon Ember", Arial, sans-serif; font-size: 14px; color: #0f1111; background: #fff; }
+a { color: #007185; text-decoration: none; }
+h1, h2, h3 { margin: 0 0 8px; }
+
+/* ---- Top bar ---- */
+#nav-belt { display: flex; align-items: center; gap: 14px; height: 60px; padding: 0 16px; background: #131921; color: #fff; }
+#nav-belt .nav-left { display: flex; align-items: center; gap: 10px; height: 100%; }
+.nav-logo { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+.nav-logo span { color: #ff9900; }
+.nav-a-2 { font-size: 12px; line-height: 1.2; color: #ccc; }
+.nav-fill { flex: 1; display: flex; }
+.nav-search { flex: 1; height: 40px; border: none; border-radius: 4px 0 0 4px; padding: 0 12px; font-size: 15px; }
+.nav-search-go { width: 46px; height: 40px; border: none; border-radius: 0 4px 4px 0; background: #febd69; font-size: 18px; }
+#nav-tools { display: flex; align-items: center; gap: 6px; height: 100%; }
+#nav-tools > a, #nav-tools > div { color: #fff; padding: 8px; font-size: 13px; line-height: 1.2; }
+#nav-link-accountList { display: block; }
+.nav-line-2 { font-weight: 700; font-size: 14px; }
+#nav-cart { font-weight: 700; font-size: 15px !important; }
+#nav-cart-count { color: #f08804; font-size: 16px; }
+#nav-main { display: flex; gap: 18px; height: 39px; align-items: center; padding: 0 16px; background: #232f3e; color: #fff; font-size: 14px; }
+
+/* ---- Cart side panel ---- */
+/* Amazon keeps space on the right for the cart side panel, also in the top bar. */
+#nav-belt, #nav-main { padding-right: 146px; }
+body.no-ewc #nav-belt, body.no-ewc #nav-main { padding-right: 16px; }
+#a-page { padding-right: 130px; background: #fff; min-height: calc(100vh - 99px); }
+#nav-flyout-ewc { position: fixed; top: 0; right: 0; bottom: 0; width: 130px; background: #fff; border-left: 1px solid #ddd; padding: 70px 10px 10px; text-align: center; font-size: 13px; z-index: 50; }
+.ewc-item { margin: 12px 0; }
+.ewc-thumb { width: 72px; height: 72px; margin: 0 auto 6px; border-radius: 8px; background: #f3efe9; }
+
+/* ---- Product page ---- */
+.dp { display: grid; grid-template-columns: 380px 1fr 260px; gap: 28px; padding: 24px 28px; }
+.dp-image { display: flex; align-items: center; justify-content: center; height: 420px; border-radius: 12px; background: #f7f4ef; }
+#productTitle { font-size: 24px; font-weight: 500; line-height: 1.3; }
+#bylineInfo { display: block; margin: 4px 0 8px; }
+#averageCustomerReviews { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
+.mock-stars { color: #de7921; letter-spacing: 1px; }
+#corePriceDisplay_desktop_feature_div { margin: 12px 0 4px; }
+.savingsPercentage { color: #cc0c39; font-size: 24px; font-weight: 300; margin-right: 8px; }
+.a-price { display: inline-flex; align-items: flex-start; }
+.a-price-symbol { font-size: 14px; position: relative; top: 4px; }
+.a-price-whole { font-size: 28px; }
+.a-offscreen { position: absolute; left: -9999px; }
+.mrp { color: #565959; font-size: 13px; }
+#promoPriceBlockMessage_feature_div { margin: 10px 0; font-size: 14px; }
+#promotions_feature_div { margin: 12px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+#promotions_feature_div .a-list-item { display: block; margin: 4px 0; }
+#feature-bullets ul { padding-left: 18px; line-height: 1.6; }
+#desktop_buybox { padding: 18px; border: 1px solid #d5d9d9; border-radius: 8px; align-self: start; }
+#availability .a-color-success { color: #007600; font-size: 16px; }
+.buy-btn { display: block; width: 100%; margin: 8px 0; padding: 9px; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; }
+#add-to-cart-button { background: #ffd814; }
+#buy-now-button { background: #ffa41c; }
+.below { padding: 0 28px 40px; }
+.rail { margin: 20px 0; padding: 16px; border-top: 1px solid #ddd; }
+.rail-cards { display: flex; gap: 14px; }
+.rail-card { width: 150px; height: 120px; border-radius: 8px; background: #f3f3f3; }
+.a-section table { border-collapse: collapse; }
+.a-section td { padding: 6px 14px 6px 0; border-bottom: 1px solid #eee; }
+
+/* ---- Search page ---- */
+.s-results { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding: 20px 28px; }
+.s-card { padding: 12px; border: 1px solid #e3e6e6; border-radius: 8px; }
+.s-thumb { height: 160px; border-radius: 8px; background: #f7f4ef; display: flex; align-items: center; justify-content: center; font-size: 54px; margin-bottom: 8px; }
+.s-card h2 { font-size: 15px; font-weight: 500; line-height: 1.35; }
+.a-color-secondary { color: #565959; font-size: 12px; }
+
+/* ---- Cart page ---- */
+.cart { display: grid; grid-template-columns: 1fr 300px; gap: 20px; padding: 24px 28px; background: #eaeded; min-height: calc(100vh - 99px); }
+#sc-active-cart, .cart-side { background: #fff; padding: 20px; border-radius: 4px; align-self: start; }
+.sc-list-item { display: flex; gap: 16px; padding: 16px 0; border-top: 1px solid #ddd; }
+.sc-thumb { width: 120px; height: 120px; border-radius: 8px; background: #f7f4ef; display: flex; align-items: center; justify-content: center; font-size: 48px; flex: none; }
+.sc-product-title { font-size: 17px; }
+.sc-delivery { margin-top: 6px; color: #0f1111; }

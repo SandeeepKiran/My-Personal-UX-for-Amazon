@@ -2,3 +2,11 @@ node_modules/
 .DS_Store
 *.zip
 *.log
+
+# Build output: store packages (tools/build.py) and media work files (tools/media/)
+dist/
+build/
+
+# Python
+__pycache__/
+.pytest_cache/

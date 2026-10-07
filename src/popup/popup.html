@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Amazon — My Personal UX</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <header>
+        <img src="../../icons/icon48.png" alt="" width="28" height="28">
+        <h1>Amazon — My Personal UX</h1>
+    </header>
+
+    <div class="az-tabs" role="tablist">
+        <button id="tab-modes" class="az-tab" type="button" role="tab">Modes</button>
+        <button id="tab-settings" class="az-tab" type="button" role="tab">Settings</button>
+    </div>
+
+    <main>
+        <div id="view-modes" role="tabpanel">
+            <div id="modes"></div>
+            <h3 class="az-aff-title">Cashback link</h3>
+            <div id="affiliate"></div>
+        </div>
+
+        <div id="view-settings" role="tabpanel" hidden>
+            <div id="settings"></div>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="../shared/settings.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>

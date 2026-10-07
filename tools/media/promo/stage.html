@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }
+  body {
+    background: linear-gradient(135deg, #0f766e 0%, #134e4a 45%, #0c1626 100%);
+    font-family: 'Segoe UI', 'Segoe UI Emoji', sans-serif; color: #d5ece8;
+  }
+  #glow { position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(900px 600px at var(--gx) var(--gy), rgba(153,246,228,.16), transparent 70%); }
+  #cap { position: absolute; left: 0; right: 0; top: 34px; text-align: center; }
+  #kicker { font-size: 26px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #99f6e4; height: 36px; }
+  #title { font-size: 66px; font-weight: 800; color: #fff; letter-spacing: -.01em; line-height: 1.1;
+    text-shadow: 0 6px 24px rgba(0,0,0,.35); }
+  #win { position: absolute; left: 312px; top: 196px; width: 1296px; border-radius: 16px; overflow: hidden;
+    background: #fff; box-shadow: 0 40px 90px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.08); }
+  #bar { height: 40px; background: #1f2a37; display: flex; align-items: center; gap: 9px; padding: 0 18px; }
+  #bar i { width: 13px; height: 13px; border-radius: 50%; display: block; }
+  #url { margin-left: 18px; flex: 1; height: 24px; border-radius: 12px; background: #0f1722; color: #a7d3cc;
+    font-size: 14px; line-height: 24px; padding: 0 14px; }
+  #view { position: relative; width: 1296px; height: 810px; overflow: hidden; }
+  #cam { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; transform-origin: 0 0; }
+  .L { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; }
+  #sweep { position: absolute; top: 0; width: 6px; height: 900px; background: #99f6e4;
+    box-shadow: 0 0 24px 8px rgba(153,246,228,.8); }
+  .ring { position: absolute; border-radius: 12px; box-sizing: border-box; }
+  .ring .lbl { position: absolute; left: 0; white-space: nowrap; font-size: 19px; font-weight: 700; color: #fff;
+    padding: 5px 12px; border-radius: 8px; }
+  #cursor { position: absolute; left: 0; top: 0; width: 34px; height: 34px; }
+  #ripple { position: absolute; border-radius: 50%; border: 3px solid #0f766e; }
+  #outro { position: absolute; inset: 0; }
+  #pop { position: absolute; left: 300px; top: 130px; width: 440px; height: 820px; overflow: hidden;
+    border-radius: 18px; box-shadow: 0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.1); background: #fff; }
+  #pop img { width: 440px; display: block; }
+  #otext { position: absolute; left: 860px; top: 300px; width: 900px; }
+  #o1 { font-size: 30px; font-weight: 600; color: #99f6e4; letter-spacing: .12em; text-transform: uppercase; }
+  #o2 { font-size: 86px; font-weight: 800; color: #fff; line-height: 1.05; margin-top: 14px; }
+  #o3 { font-size: 40px; font-weight: 600; color: #d5ece8; margin-top: 30px; }
+  #o4 { font-size: 30px; color: #a7d3cc; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div id="glow"></div>
+<div id="cap"><div id="kicker"></div><div id="title"></div></div>
+<div id="win">
+  <div id="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>
+    <div id="url"></div></div>
+  <div id="view"><div id="cam"></div></div>
+</div>
+<div id="outro">
+  <div id="pop"><img src="shots/popup_settings.png"></div>
+  <div id="otext">
+    <div id="o1">Free browser extension</div>
+    <div id="o2">Amazon —<br>My Personal UX</div>
+    <div id="o3">Chrome · Edge · Firefox</div>
+    <div id="o4">v5.0.0 · Made with ❤️ by Mousy!</div>
+  </div>
+</div>
+<script>
+const B = window.BOXES;
+const SHOTS = ['product_off', 'product_off_panel', 'product_on_panel', 'product_on', 'search_off', 'search_on', 'cart_on'];
+const cam = document.getElementById('cam');
+const layers = {};
+for (const name of SHOTS) {
+  const img = document.createElement('img');
+  img.className = 'L'; img.src = `shots/${name}.png`;
+  cam.appendChild(img); layers[name] = img;
+}
+const sweep = document.createElement('div'); sweep.id = 'sweep'; cam.appendChild(sweep);
+const ringBox = document.createElement('div'); cam.appendChild(ringBox);
+const ripple = document.createElement('div'); ripple.id = 'ripple'; cam.appendChild(ripple);
+const cursor = document.createElement('div'); cursor.id = 'cursor';
+cursor.innerHTML = '<svg viewBox="0 0 24 24" width="34" height="34"><path d="M4 2l15 11-6.5 1 3.8 7.4-3 1.5-3.8-7.5L4 20z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+cam.appendChild(cursor);
+
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const eo = (x) => 1 - Math.pow(1 - x, 3);
+const eio = (x) => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = (x) => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const lerp = (a, b, x) => a + (b - a) * x;
+
+const SCENES = [
+  { a: 0, b: 3.5, kicker: '', title: 'Amazon is loud.', url: 'amazon.in/dp/B0MOUSY001' },
+  { a: 3.5, b: 7.5, kicker: 'Amazon — My Personal UX', title: 'One click. A calm Amazon.', capIn: 5.6, url: 'amazon.in/dp/B0MOUSY001' },
+  { a: 7.5, b: 11, kicker: 'Product page', title: 'See the real price.', url: 'amazon.in/dp/B0MOUSY001' },
+  { a: 11, b: 14.5, kicker: 'Search results', title: 'Unit prices. No sponsored clutter.', url: 'amazon.in/s?k=mousy+coffee' },
+  { a: 14.5, b: 18, kicker: 'Cart', title: 'Know which items earn cashback.', url: 'amazon.in/gp/cart/view.html' },
+];
+
+const RED = '#e11d48', TEAL = '#0f766e';
+// Each ring: shot it belongs to, box key, colour, label, label side, time in, time out.
+const RINGS = [
+  ['product_off', 'urgency', RED, 'Fake urgency', 'below', 0.8, 3.25],
+  ['product_off', 'emi', RED, 'EMI upsell', 'below', 1.25, 3.25],
+  ['product_off', 'delivery', RED, 'Fee in small print', 'left', 1.7, 3.25],
+  ['product_on', 'fee', TEAL, 'Delivery fee, in plain sight', 'right', 8.4, 10.75],
+  ['product_on', 'actions', TEAL, 'Price history + reviews', 'right', 8.95, 10.75],
+  ['product_on', 'coupon', TEAL, 'Coupon applied for you', 'right', 9.5, 10.75],
+  ['search_off', 'sponsored', RED, 'Sponsored', 'below', 11.45, 11.95],
+  ['search_on', 'unit', TEAL, 'Price per 100 g', 'below', 12.9, 14.25],
+  ['search_on', 'few', TEAL, 'Only 37 ratings', 'below', 13.35, 14.25],
+  ['cart_on', 'list', TEAL, 'Tracked items', 'below', 15.2, 17.75],
+  ['cart_on', 'fee', TEAL, 'Cart fee, highlighted', 'right', 15.8, 17.75],
+];
+
+function ringEl(r, t) {
+  const [shot, key, color, label, side, tin, tout] = r;
+  const box = B[shot][key];
+  const p = 8;
+  const pop = seg(t, tin, tin + 0.28), fade = 1 - seg(t, tout - 0.25, tout);
+  const op = Math.min(pop, fade);
+  if (op <= 0) return null;
+  const s = lerp(1.25, 1, back(pop));
+  const d = document.createElement('div');
+  d.className = 'ring';
+  Object.assign(d.style, {
+    left: `${box.x - p}px`, top: `${box.y - p}px`, width: `${box.width + 2 * p}px`, height: `${box.height + 2 * p}px`,
+    border: `4px solid ${color}`, boxShadow: `0 0 0 6px ${color}33, 0 8px 26px ${color}55`,
+    opacity: op, transform: `scale(${s})`,
+  });
+  const l = document.createElement('div');
+  l.className = 'lbl'; l.textContent = label; l.style.background = color;
+  if (side === 'below') l.style.top = 'calc(100% + 10px)';
+  if (side === 'above') l.style.bottom = 'calc(100% + 10px)';
+  if (side === 'left') { l.style.left = 'auto'; l.style.right = 'calc(100% + 14px)'; l.style.top = '50%'; l.style.transform = 'translateY(-50%)'; }
+  if (side === 'right') { l.style.left = 'calc(100% + 14px)'; l.style.top = '50%'; l.style.transform = 'translateY(-50%)'; }
+  d.appendChild(l);
+  return d;
+}
+
+function show(weights) {
+  for (const name of SHOTS) {
+    const w = weights[name] ?? 0;
+    layers[name].style.opacity = w;
+    layers[name].style.clipPath = 'none';
+  }
+}
+
+function wipe(from, to, x) {
+  show({ [from]: 1, [to]: 1 });
+  const edge = lerp(-10, 1450, eio(x));
+  layers[to].style.clipPath = `inset(0 ${1440 - edge}px 0 0)`;
+  sweep.style.display = x > 0 && x < 1 ? 'block' : 'none';
+  sweep.style.left = `${edge - 3}px`;
+}
+
+function zoomOn(box, z) {
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+  const x = clamp(cx - 720 / z, 0, 1440 - 1440 / z), y = clamp(cy - 450 / z, 0, 900 - 900 / z);
+  return { z, x, y };
+}
+
+function setCam(c) { cam.style.transform = `scale(${0.9 * c.z}) translate(${-c.x}px, ${-c.y}px)`; }
+const camLerp = (a, b, x) => ({ z: lerp(a.z, b.z, x), x: lerp(a.x, b.x, x), y: lerp(a.y, b.y, x) });
+const center = (cx, cy) => ({ x: cx, y: cy, width: 0, height: 0 });
+
+function setCursor(x, y, op) {
+  cursor.style.opacity = op;
+  cursor.style.transform = `translate(${x - 6}px, ${y - 3}px)`;
+}
+
+function setRipple(x, y, tc, t) {
+  const k = seg(t, tc, tc + 0.4);
+  if (k <= 0 || k >= 1) { ripple.style.opacity = 0; return; }
+  const r = lerp(8, 46, eo(k));
+  Object.assign(ripple.style, { left: `${x - r}px`, top: `${y - r}px`, width: `${2 * r}px`, height: `${2 * r}px`, opacity: 1 - k });
+}
+
+function caption(t) {
+  const s = SCENES.find((sc) => t >= sc.a && t < sc.b);
+  const cap = $('cap');
+  if (!s) { cap.style.opacity = 0; return; }
+  const tin = s.capIn ?? s.a + 0.1;
+  const k = eo(seg(t, tin, tin + 0.4)), out = 1 - seg(t, s.b - 0.3, s.b - 0.05);
+  $('kicker').textContent = s.kicker; $('title').textContent = s.title;
+  cap.style.opacity = Math.min(k, out);
+  cap.style.transform = `translateY(${lerp(24, 0, k)}px)`;
+  $('url').textContent = s.url;
+}
+
+window.renderFrame = function (t) {
+  const fab = B.product_off.fab, simple = B.product_off_panel.simple;
+  const FAB = { x: fab.x + 28, y: fab.y + 28 }, SIMPLE = { x: simple.x + 10, y: simple.y + 10 };
+  const WIDE = { z: 1, x: 0, y: 0 };
+  const P = B.product_on;
+  const PRICE_ZOOM = zoomOn(center(760, 520), 1.4);
+
+  document.documentElement.style.setProperty('--gx', `${lerp(20, 80, t / 22)}%`);
+  document.documentElement.style.setProperty('--gy', `${lerp(20, 70, t / 22)}%`);
+  sweep.style.display = 'none';
+  setCursor(0, 0, 0); ripple.style.opacity = 0;
+  let c = WIDE, winOp = 1, winY = 0;
+
+  if (t < 3.5) {
+    show({ product_off: 1 });
+    c = camLerp(WIDE, zoomOn(center(700, 430), 1.05), eio(seg(t, 0, 3.5)));
+  } else if (t < 7.5) {
+    c = camLerp(zoomOn(center(700, 430), 1.05), WIDE, eio(seg(t, 3.5, 3.9)));
+    if (t < 4.45) show({ product_off: 1 });
+    else if (t < 4.6) show({ product_off: 1, product_off_panel: seg(t, 4.45, 4.6) });
+    else if (t < 5.25) show({ product_off_panel: 1 });
+    else if (t < 6.0) wipe('product_off_panel', 'product_on_panel', seg(t, 5.25, 6.0));
+    else if (t < 6.6) show({ product_on_panel: 1 });
+    else show({ product_on_panel: 1 - seg(t, 6.6, 6.85), product_on: 1 });
+    // Cursor path: enter, go to the panel button, click, go to Simple, click, leave.
+    const m1 = eio(seg(t, 3.6, 4.3)), m2 = eio(seg(t, 4.6, 5.1));
+    let x = lerp(820, FAB.x, m1), y = lerp(640, FAB.y, m1);
+    x = lerp(x, SIMPLE.x, m2); y = lerp(y, SIMPLE.y, m2);
+    setCursor(x, y, Math.min(seg(t, 3.6, 3.8), 1 - seg(t, 5.7, 6.0)));
+    if (t >= 5.2 && t < 5.6) setRipple(SIMPLE.x, SIMPLE.y, 5.2, t);
+    else if (t >= 4.4 && t < 4.8) setRipple(FAB.x, FAB.y, 4.4, t);
+  } else if (t < 11) {
+    show({ product_on: 1 });
+    c = camLerp(WIDE, PRICE_ZOOM, eio(seg(t, 7.5, 8.2)));
+    winOp = 1 - seg(t, 10.75, 11);
+  } else if (t < 14.5) {
+    winOp = t < 11.3 ? seg(t, 11, 11.3) : 1 - seg(t, 14.25, 14.5);
+    if (t < 12.0) show({ search_off: 1 });
+    else if (t < 12.75) wipe('search_off', 'search_on', seg(t, 12.0, 12.75));
+    else show({ search_on: 1 });
+  } else if (t < 18) {
+    show({ cart_on: 1 });
+    winOp = t < 14.8 ? seg(t, 14.5, 14.8) : 1 - seg(t, 17.75, 18);
+    winY = t > 17.75 ? lerp(0, 30, eio(seg(t, 17.75, 18))) : 0;
+    c = camLerp(WIDE, zoomOn(center(680, 450), 1.04), eio(seg(t, 14.5, 18)));
+  } else {
+    winOp = 0;
+  }
+  setCam(c);
+  $('win').style.opacity = winOp;
+  $('win').style.transform = `translateY(${winY}px)`;
+
+  ringBox.replaceChildren(...RINGS.map((r) => ringEl(r, t)).filter(Boolean));
+  caption(t);
+
+  // Outro: popup card slides in and scrolls; text lines arrive one by one.
+  const outro = $('outro');
+  const ok = eo(seg(t, 18.05, 18.6));
+  outro.style.opacity = t < 18 ? 0 : 1;
+  $('pop').style.opacity = ok;
+  $('pop').style.transform = `translateY(${lerp(50, 0, ok)}px)`;
+  const popImg = $('pop').querySelector('img');
+  const maxScroll = Math.max(0, popImg.offsetHeight - $('pop').clientHeight);
+  popImg.style.transform = `translateY(${-lerp(0, maxScroll, eio(seg(t, 18.8, 21.6)))}px)`;
+  [['o1', 18.35], ['o2', 18.55], ['o3', 19.0], ['o4', 19.45]].forEach(([id, a]) => {
+    const k = eo(seg(t, a, a + 0.45));
+    $(id).style.opacity = k;
+    $(id).style.transform = `translateX(${lerp(40, 0, k)}px)`;
+  });
+};
+</script>
+</body>
+</html>
