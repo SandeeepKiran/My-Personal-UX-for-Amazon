@@ -87,6 +87,24 @@ function makeChip(text, kind, note, feature) {
     return chip;
 }
 
+// Hides a part of Amazon's text, for example "₹59 delivery". showHiddenText() puts it back.
+// The wrapper has no data-az-feature, because cleanup removes those nodes and the text with them.
+function hideText(node, tag) {
+    const wrap = document.createElement('span');
+    wrap.className = 'az-hidden-text';
+    wrap.dataset.azHide = tag;
+    node.replaceWith(wrap);
+    wrap.append(node);
+}
+
+function showHiddenText(tag) {
+    for (const wrap of $$(`.az-hidden-text[data-az-hide="${tag}"]`)) {
+        const parent = wrap.parentNode;
+        wrap.replaceWith(...wrap.childNodes);
+        parent?.normalize();
+    }
+}
+
 // ---------- Money ----------
 
 var CURRENCY = IS_IN ? { symbol: '₹', locale: 'en-IN' } : { symbol: '$', locale: 'en-US' };

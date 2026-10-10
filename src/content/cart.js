@@ -57,6 +57,22 @@ defineFeature({
     reset() { releaseClaims('azWarranty'); },
 });
 
+// The buy box offers plans as check boxes: "Add a Protection Plan: 1 Year Extended Warranty".
+// If a box is already ticked, the plan stays visible. The user must see what is in the order.
+defineFeature({
+    name: 'protection plan boxes',
+    keys: ['dismissWarranty'],
+    run() {
+        if (!enabled('dismissWarranty')) return;
+        for (const box of $$('#abbWrapper, #mbb_feature_div fieldset')) {
+            if (!box.querySelector('[id^="mbb-offeringID"], input[name^="offeringID"]')) continue;
+            if (box.querySelector('input[type=checkbox]:checked')) continue;
+            if (claim(box, 'azPlanBox')) box.classList.add('az-protection-plan');
+        }
+    },
+    reset() { removeClass('az-protection-plan'); releaseClaims('azPlanBox'); },
+});
+
 // ---------- Cart fees ----------
 
 // The cart shows charges as body text, for example "₹64.96 delivery Thu, 13 Aug".

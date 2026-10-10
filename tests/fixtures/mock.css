@@ -50,7 +50,7 @@ body.no-ewc #nav-belt, body.no-ewc #nav-main { padding-right: 16px; }
 #promotions_feature_div { margin: 12px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
 #promotions_feature_div .a-list-item { display: block; margin: 4px 0; }
 #feature-bullets ul { padding-left: 18px; line-height: 1.6; }
-#desktop_buybox { padding: 18px; border: 1px solid #d5d9d9; border-radius: 8px; align-self: start; }
+#desktop_buybox, #rightCol { padding: 18px; border: 1px solid #d5d9d9; border-radius: 8px; align-self: start; }
 #availability .a-color-success { color: #007600; font-size: 16px; }
 .buy-btn { display: block; width: 100%; margin: 8px 0; padding: 9px; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; }
 #add-to-cart-button { background: #ffd814; }

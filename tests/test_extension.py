@@ -39,7 +39,7 @@ def test_popup_groups_settings_by_amazon_area(harness):
         "Search results", "Product page: price and offers", "Product page: helpers",
         "Product page: clutter", "Add to cart and cart", "Top bar",
     ]
-    assert popup.locator(".az-switch").count() == 24
+    assert popup.locator(".az-switch").count() == 26
 
 
 def test_popup_footer_shows_version_then_credit(harness):
@@ -63,7 +63,7 @@ def test_popup_change_reaches_open_page(harness):
 def test_product_page_features(harness):
     page = harness.open("/dp/B0MOUSY001")
     assert page.locator('[data-az-feature="seller"]').inner_text().startswith("Third-party seller: Mousy Traders")
-    assert page.locator(".az-chip-fee").all_inner_texts() == ["+₹40 delivery fee"] * 2
+    assert page.locator(".az-chip-fee").all_inner_texts() == ["+₹40 delivery fee"]
     assert page.locator("#az-pricehistory").inner_text() == "Keepa"
     assert page.locator("#az-pricehistory-alt").count() == 1
     assert page.locator("#az-reviews .az-rating-value").inner_text() == "4.3"
@@ -72,6 +72,60 @@ def test_product_page_features(harness):
     assert not page.locator("#availability span").is_visible()
     assert not page.locator("#sims-simsContainer_feature_div_01").is_visible()
     assert not page.locator("#inemi_feature_div").is_visible()
+
+
+def test_product_page_2026_layout(harness):
+    """The 2026 Amazon layout: seller card, buy box price, coupon card, offers carousel, trust icons."""
+    page = harness.open("/dp/B0MOUSY010")
+    # The brand (MousyLatest) and the seller (Mousy Latest) are the same.
+    assert page.locator('[data-az-feature="seller"]').inner_text().startswith("Sold by the brand: Mousy Latest")
+    assert page.locator(".az-chip-fee").all_inner_texts() == ["+₹59 delivery fee"] * 2
+    # The middle column chip is on the same line as the big price.
+    assert page.locator("#centerCol .apex-pricetopay-value + .az-chip-fee").count() == 1
+    # The chips show the fee. Thus, the buy box shows only the date and the order time.
+    delivery = page.locator("#mir-layout-DELIVERY_BLOCK-slot-PRIMARY_DELIVERY_MESSAGE_LARGE").inner_text()
+    assert delivery.splitlines() == ["Tuesday, 13 October.", "Order within 12 hrs 42 mins. Details"]
+    # Minimal Product UI is on by default: the buttons go below the main price, then the offers.
+    assert page.locator("#centerCol #az-actions #az-pricehistory").count() == 1
+    assert page.locator("#centerCol #az-actions #az-reviews").count() == 1
+    assert page.evaluate("window.mousyCouponClicks") == 1
+    assert "az-coupon" in page.locator("#coupons-card-feature").get_attribute("class")
+    # The cashback summary stays. The bank offers come from the "See all offers" panel.
+    bank = page.locator("#az-bank .az-chip").all_inner_texts()
+    assert bank[0].startswith("3 cashback offers available")
+    assert bank[1].startswith("Mousy Bank Credit Card: 10% Instant Discount")
+    assert bank[2].startswith("HDFC Bank Debit Card: ₹75 cashback")
+    # The delivery date is bigger than the text around it.
+    assert page.locator(".az-delivery-date").evaluate("n => getComputedStyle(n).fontSize") == "18px"
+    assert not page.locator("#abbWrapper").is_visible()
+    assert not page.locator("#iconfarmv2_feature_div").is_visible()
+    # Amazon's own "Offers" heading and summary card repeat the blue chip. "See all offers" stays.
+    assert not page.locator("#offersHeader_feature_div").is_visible()
+    assert not page.locator("#smx-secondary-view-id").is_visible()
+    assert page.locator("#cardification-secondary-view-id").is_visible()
+
+
+def test_bank_offers_for_my_cards(harness):
+    popup = harness.popup()
+    popup.locator("#tab-settings").click()
+    popup.locator(".az-cards input").fill("hdfc")
+    popup.locator(".az-cards input").press("Enter")
+    page = harness.open("/dp/B0MOUSY010")
+    page.wait_for_timeout(600)
+    bank = page.locator("#az-bank .az-chip").all_inner_texts()
+    assert any(text.startswith("Your card, HDFC Bank Debit Card: ₹75 cashback") for text in bank)
+    assert not any("Mousy Bank" in text for text in bank)
+
+
+def test_minimal_ui_off_puts_buttons_in_buy_box(harness):
+    page = harness.open("/dp/B0MOUSY010")
+    popup = harness.popup()
+    popup.locator("#tab-settings").click()
+    popup.locator('[data-az-key="minimalProductUi"]').click()
+    page.wait_for_timeout(600)
+    assert page.locator("#centerCol #az-actions").count() == 0
+    assert page.locator("#rightCol #az-actions #az-pricehistory").count() == 1
+    assert page.locator("#centerCol #az-bank").count() == 1
 
 
 def test_account_menu_uses_name_and_safe_wishlists(harness):
@@ -93,9 +147,10 @@ def test_explore_menu_has_no_amazon_fresh(harness):
     assert not page.locator("#nav-main").is_visible()
 
 
-def test_page_is_quiet_after_load(harness):
+@pytest.mark.parametrize("path", ["/dp/B0MOUSY001", "/dp/B0MOUSY010", "/s?k=mousy"])
+def test_page_is_quiet_after_load(harness, path):
     """Our own DOM changes must not start new runs. Count mutations for 2 seconds."""
-    page = harness.open("/dp/B0MOUSY001")
+    page = harness.open(path)
     page.wait_for_timeout(1000)
     count = page.evaluate("""() => new Promise(resolve => {
         let n = 0;
@@ -116,6 +171,9 @@ def test_alt_a_opens_panel_and_disabled_mode_removes_everything(harness):
     page.locator('#az-panel input[value="off"]').check()
     page.wait_for_timeout(500)
     assert page.locator(".az-chip, [data-az-feature]").count() == 0
+    # The hidden "₹40 delivery" words come back, with no extra line breaks.
+    assert page.locator(".az-hidden-text").count() == 0
+    assert "₹40 delivery Thursday, 15 October." in page.locator("#mir-layout-DELIVERY_BLOCK-slot-PRIMARY_DELIVERY_MESSAGE_LARGE").inner_text()
     assert page.evaluate("document.documentElement.getAttribute('data-az')") == "off"
     assert page.locator("#nav-main").is_visible()
 
@@ -142,6 +200,11 @@ def test_search_results(harness):
     assert page.locator("#card-oatmilk .az-chip-unit").inner_text() == "₹24.90 / 100 ml"
     assert page.locator("#card-oatmilk .az-chip-warn").inner_text() == "Only 37 ratings"
     assert page.locator("#card-filters .az-chip-unit").inner_text() == "₹1.80 / piece"
+    assert page.locator("#card-iceroller .az-chip-fee").inner_text() == "+₹59 delivery fee"
+    assert page.locator("#card-freedelivery .az-chip-fee").count() == 0
+    # The chip shows the fee. Thus, Amazon's line shows only the date. FREE delivery stays.
+    assert page.locator("#card-iceroller [data-cy='delivery-recipe']").inner_text() == "Tue, 13 Oct"
+    assert page.locator("#card-freedelivery [data-cy='delivery-recipe']").inner_text().startswith("FREE delivery")
 
 
 # ---------- Cart and cashback ----------

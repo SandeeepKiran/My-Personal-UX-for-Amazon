@@ -107,6 +107,53 @@ defineFeature({
     },
 });
 
+// "₹59 delivery Tue, 13 Oct" is a charge. "FREE delivery Today" is not.
+var CARD_FEE_RE = /(?:^|[^a-z])([₹$]\s*[\d,]+(?:\.\d{1,2})?)\s*(delivery|shipping)\b/i;
+
+function cardDeliveryFee(card) {
+    const line = card.querySelector('[data-cy="delivery-recipe"] .udm-primary-delivery-message, [data-cy="delivery-recipe"]');
+    const text = (line?.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!text || text.length > 200) return null;
+    const match = text.match(CARD_FEE_RE);
+    if (!match || /\b(free|no|zero)\s*$/i.test(text.slice(0, match.index + 1))) return null;
+    const amount = parseMoney(match[1]);
+    return amount > 0 ? { amount, label: match[2].toLowerCase() } : null;
+}
+
+function showCardFees() {
+    if (!enabled('showHiddenFees')) return;
+    for (const card of $$('div[data-component-type="s-search-result"]')) {
+        if (!claim(card, 'azCardFee')) continue;
+        const fee = cardDeliveryFee(card);
+        if (!fee) continue;
+        const price = card.querySelector('[data-cy="price-recipe"] .a-price, .a-price');
+        if (!price) continue;
+        // Amazon wraps the price in a link. Put the chip after the link, so a click on it does not open the product.
+        const chip = makeChip(`+${formatFee(fee.amount)} ${fee.label} fee`, 'fee', '', 'card-fees');
+        chip.classList.add('az-fee-inline');
+        chip.title = 'Charges that Amazon adds to the listed price';
+        (price.closest('a') || price).insertAdjacentElement('afterend', chip);
+        hideCardFeeWords(card);
+    }
+}
+
+// The chip shows the fee. Thus, hide "₹59 delivery" in Amazon's line, and keep the date.
+function hideCardFeeWords(card) {
+    const line = card.querySelector('[data-cy="delivery-recipe"] .udm-primary-delivery-message, [data-cy="delivery-recipe"]');
+    if (!line) return;
+    const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (CARD_FEE_RE.test(node.textContent)) { hideText(node, 'card-fees'); return; }
+    }
+}
+
+defineFeature({
+    name: 'search fees',
+    keys: ['showHiddenFees'],
+    run: showCardFees,
+    reset() { showHiddenText('card-fees'); releaseClaims('azCardFee'); removeFeatureNodes('card-fees'); },
+});
+
 // The ad strips and skyscraper ads are hidden by CSS. See data-az-ads in content.css.
 defineFeature({
     name: 'search ads',

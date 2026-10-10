@@ -8,6 +8,51 @@ Each `## [x.y.z]` section is the text for the GitHub release with the tag `vx.y.
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-10-11
+
+The product page now fits Amazon's 2026 layout. Delivery fees show in search results,
+and bank offers match your cards again.
+
+### Added
+
+- **Minimal Product UI (v2, new)** switch. On (the default): the Keepa, Price History
+  and reviews buttons go below the main price, with the bank offers below them.
+  Off: they go in the buy box, next to the price.
+- **Tidy delivery text in the buy box.** A charged delivery: the "₹59 delivery" words go,
+  because the red chips show the fee. All deliveries: the text is on three lines
+  ("FREE delivery", the date, "Order within ..."), and the date is bigger.
+  "Warn about extra fees" controls it.
+- **Bank offers for your cards on the 2026 layout.** The extension loads Amazon's own
+  "See all offers & discounts" panel one time for each product page, with the same
+  request that Amazon makes when you click it. It shows the offer for each card in
+  "My cards", or a warning when no offer is for your cards. With "Hide EMI options" on,
+  EMI card offers do not show.
+- **Protection plan boxes hidden.** "Decline protection plans" also hides the "Add a
+  Protection Plan" check boxes in the buy box. If a box is ticked, it stays visible.
+- **Hide the trust icons** switch. Hides the row of icons such as "10 days Replacement",
+  "Top Brand" and "Secure transaction".
+- **Delivery fees in search results.** A red "+₹59 delivery fee" chip shows next to the
+  price, and Amazon's "₹59 delivery" words go. "FREE delivery" stays. The "Warn about
+  extra fees" switch controls it.
+- **Brand seller chip.** When the seller has the same name as the brand, a green
+  "Sold by the brand" chip shows instead of the yellow third-party chip.
+
+### Changed
+
+- **Fee chip in the middle column** is now on the same line as the big price, not on a
+  line below it.
+
+### Fixed
+
+- **Seller chip** showed "Third-party seller: Learn more about the seller" on the 2026
+  Amazon layout. It now reads the seller name from the new seller card.
+- **Coupons** in the new "Apply Coupon" card were not highlighted or applied.
+- **Bank offers** did not show on the 2026 layout. The new offers carousel has only a
+  summary card ("3 cashback offers available"). The chip shows that summary, and a click
+  on it opens Amazon's offer details. Amazon's own "Offers" heading and summary card are hidden,
+  because the chip repeats them. "See all offers & discounts" stays.
+- The product page fee check removed the red fee chips on pages with no product fee.
+
 ## [5.0.0] - 2026-10-08
 
 A large change. The extension now works in Chrome, Edge and Firefox, the settings are

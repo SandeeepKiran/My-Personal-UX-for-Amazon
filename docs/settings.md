@@ -18,7 +18,7 @@ All switches are on by default. "IN" means amazon.in only.
 | Key | Label | Feature (file) |
 |---|---|---|
 | `biggerPrice` | Bigger price | bigger price (`product.js`) |
-| `showHiddenFees` | Warn about extra fees | extra fees (`product.js`), cart fees (`cart.js`) |
+| `showHiddenFees` | Warn about extra fees | extra fees, delivery text (`product.js`), search fees (`search.js`), cart fees (`cart.js`) |
 | `highlightCoupon` | Highlight coupons | coupons (`product.js`) |
 | `autoApplyCoupon` | Apply coupons automatically | coupons (`product.js`) |
 | `showBankOffers` (IN) | Show bank offers | bank offers (`product.js`) |
@@ -29,6 +29,7 @@ All switches are on by default. "IN" means amazon.in only.
 
 | Key | Label | Feature (file) |
 |---|---|---|
+| `minimalProductUi` | Minimal Product UI (v2, new) | price history, reviews buttons, bank offers (`product.js`) |
 | `showSellerBadge` | Show the seller | seller badge (`product.js`) |
 | `priceHistoryButton` | Price history buttons (Keepa, PriceHistory) | price history (`product.js`) |
 | `reviewsButton` | Reviews button | reviews button (`product.js`) |
@@ -42,6 +43,7 @@ All switches are on by default. "IN" means amazon.in only.
 | `hideProductVideos` | Hide the video rail | product videos (`product.js`) |
 | `hideBrandCarousel` | Hide the brand rail | brand rail (`product.js`) |
 | `hideFeedbackBlock` | Hide the Feedback block | feedback block (`product.js`) |
+| `hideTrustIcons` | Hide the trust icons | trust icons (`product.js`) |
 | `reorderDetails` | Specs before recommendations | section order (`product.js`) |
 
 ## 🛒 Add to cart and cart
@@ -49,7 +51,7 @@ All switches are on by default. "IN" means amazon.in only.
 | Key | Label | Feature (file) |
 |---|---|---|
 | `fixSubscribeSave` | Choose one-time purchase | subscribe and save (`cart.js`) |
-| `dismissWarranty` | Decline protection plans | protection plans (`cart.js`) |
+| `dismissWarranty` | Decline protection plans | protection plans, protection plan boxes (`cart.js`) |
 | `ewcCollapse` | Fold the cart side panel | cart side panel (`cart.js`) |
 | `cashkaroWatch` (IN) | Cashback watch | cashback banner (`cashback.js`) |
 
@@ -67,5 +69,5 @@ All switches are on by default. "IN" means amazon.in only.
 2. In the feature, read the setting with `enabled('key')`.
 3. Add the key to the `keys` list of the feature, so a change resets the feature.
 4. Add a row to this page.
-5. Update the switch count in `tests/test_extension.py` (now 24).
+5. Update the switch count in `tests/test_extension.py` (now 26).
 6. Run the tests.

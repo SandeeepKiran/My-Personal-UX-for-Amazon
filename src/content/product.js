@@ -5,18 +5,54 @@
 
 // ---------- Seller ----------
 
+// The 2026 layout puts the name in #merchant-trust-info-card. On that layout,
+// #sellerProfileTriggerId is a hidden "Learn more about the seller" link. Thus, it comes last.
+var SELLER_NAME_SELECTORS = [
+    '#merchant-trust-info-card',
+    '[offer-display-feature-name="desktop-merchant-info"] .offer-display-feature-text-message',
+    '#sellerProfileTriggerId',
+    '#merchant-info a',
+    '#tabular-buybox .tabular-buybox-text[tabular-attribute-name="Sold by"] span',
+];
+
+function sellerName() {
+    for (const selector of SELLER_NAME_SELECTORS) {
+        const text = ($(selector)?.textContent || '').replace(/\s+/g, ' ').trim();
+        if (text && text.length < 80 && !/learn more|see more|details/i.test(text)) return text;
+    }
+    return '';
+}
+
+// The byline is "Brand: MousyLatest" or "Visit the Mousy Store".
+function brandName() {
+    const text = ($('#bylineInfo')?.textContent || '').replace(/\s+/g, ' ').trim();
+    const match = text.match(/^brand:\s*(.+)$/i) || text.match(/^visit the\s+(.+?)\s+store$/i);
+    return match ? match[1] : '';
+}
+
+// "Mousy Latest" and "MousyLatest" are the same name. Thus, compare letters and digits only.
+function sameName(a, b) {
+    const clean = value => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const x = clean(a);
+    const y = clean(b);
+    // A close name is not enough. A wrong "brand" chip is worse than a third-party chip.
+    return Boolean(x) && x === y;
+}
+
 function annotateSeller() {
     if (!enabled('showSellerBadge')) return;
     const buyBox = $('#desktop_buybox, #buybox, #rightCol');
-    if (!buyBox || !claim(buyBox, 'azSeller')) return;
-    const sellerEl = $('#sellerProfileTriggerId') || $('#merchant-info a') || $('#tabular-buybox .tabular-buybox-text[tabular-attribute-name="Sold by"] span');
-    const name = sellerEl ? sellerEl.textContent.trim() : '';
-    if (!name) return;
+    if (!buyBox || buyBox.dataset.azSeller) return;
+    const name = sellerName();
+    // Amazon can load the seller after the first run. Claim the buy box only when the name is there.
+    if (!name || !claim(buyBox, 'azSeller')) return;
     // Cloudtail and Appario are Amazon's own seller companies in India.
     const isAmazon = /amazon|cloudtail|appario/i.test(name);
     const chip = isAmazon
         ? makeChip(`Sold by ${name}`, 'good', '', 'seller')
-        : makeChip(`Third-party seller: ${name}`, 'warn', '(the seller handles returns)', 'seller');
+        : sameName(name, brandName())
+            ? makeChip(`Sold by the brand: ${name}`, 'brand', '(the brand handles returns)', 'seller')
+            : makeChip(`Third-party seller: ${name}`, 'warn', '(the seller handles returns)', 'seller');
     const target = $('#apex_desktop') || $('#corePrice_feature_div') || buyBox.firstElementChild;
     target?.insertAdjacentElement('beforebegin', chip);
 }
@@ -125,6 +161,19 @@ defineFeature({
     reset() { removeClass('az-feedback'); releaseClaims('azFeedback'); },
 });
 
+// The row of icons below the offers: "10 days Replacement", "Top Brand", "Secure transaction".
+defineFeature({
+    name: 'trust icons',
+    keys: ['hideTrustIcons'],
+    run() {
+        if (!enabled('hideTrustIcons')) return;
+        for (const node of $$('#iconfarmv2_feature_div, #icon-farm-container')) {
+            if (claim(node, 'azTrustIcons')) node.classList.add('az-trust-icons');
+        }
+    },
+    reset() { removeClass('az-trust-icons'); releaseClaims('azTrustIcons'); },
+});
+
 // ---------- EMI and bank offers (amazon.in) ----------
 
 var EMI_SELECTORS = '#inemi_feature_div, #emiSignalWithOfferMessaging_feature_div, #creditCardSignalWithOfferMessaging_feature_div, #exportsEMIMessage_feature_div, #emiPlansDetails, #emiOptionsSection, #installmentCalculator_feature_div';
@@ -146,33 +195,154 @@ defineFeature({
     reset() { removeClass('az-emi'); releaseClaims('azEmi'); },
 });
 
-function showBankOffers() {
-    if (!enabled('showBankOffers')) return;
+// The main price block in the middle column. The bank offers and the "classic" buttons go below it.
+function centerPriceBlock() {
+    return $('#centerCol #apex_desktop') || $('#centerCol #corePrice_feature_div') || $('#centerCol #corePriceDisplay_desktop_feature_div')
+        || $('#apex_desktop') || $('#corePrice_feature_div');
+}
+
+// The old offers list has the full offer text.
+function listedBankOffers() {
     const host = $('#promotions_feature_div, #applicable_promotion_list_sec, #itembox-InstantBankDiscount');
-    if (!host || !claim(host, 'azBank')) return;
-    const offers = [...new Set($$('.offers-items-content, .a-list-item, .a-truncate-full, .a-section', host)
+    if (!host) return [];
+    return [...new Set($$('.offers-items-content, .a-list-item, .a-truncate-full, .a-section', host)
         .map(node => (node.textContent || '').replace(/\s+/g, ' ').trim())
         .filter(text => text.length > 20 && text.length < 300 && /bank offer|cashback|instant discount|% off on/i.test(text)))];
-    if (!offers.length) return;
+}
 
-    const cards = settings.myCards.split(',').map(card => card.trim().toLowerCase()).filter(Boolean);
-    const mine = offers.filter(offer => cards.some(card => offer.toLowerCase().includes(card)));
-    const box = el('div', { 'data-az-feature': 'bank' });
-    if (cards.length && mine.length) {
-        for (const offer of mine) box.append(makeChip(`Your card: ${offer}`, 'good', '', 'bank'));
-    } else if (cards.length) {
-        box.append(makeChip('No bank offer for your cards', 'warn', `(${offers.length} offer${offers.length === 1 ? '' : 's'} for other cards)`, 'bank'));
-    } else {
-        for (const offer of offers.slice(0, 3)) box.append(makeChip(offer, 'good', '', 'bank'));
+// The 2026 offers carousel shows only a summary card, for example "3 cashback offers available".
+// Amazon loads the full text only when you click the card. Thus, the chip clicks Amazon's card.
+function carouselOfferCards() {
+    return $$('#smx_feature_div [aria-label]')
+        .map(node => ({ node, label: (node.getAttribute('aria-label') || '').trim() }))
+        .filter(({ label }) => label.length < 80 && /\boffers? available\b/i.test(label));
+}
+
+// "See all offers & discounts" opens a panel that Amazon loads from its own server.
+// The panel lists each bank offer under its card name, for example "SBI Credit Card".
+function allOffersLink() {
+    for (const node of $$('#smx_feature_div [data-smx-desktop-secondary-view]')) {
+        try {
+            const view = JSON.parse(node.getAttribute('data-smx-desktop-secondary-view'));
+            if (/^smx-AOP-secondary-view/.test(view.name) && /^\/hz\/smx\//.test(view.url)) return { node, url: view.url };
+        } catch { /* Not JSON. Try the next node. */ }
     }
-    ($('#corePrice_feature_div') || $('#apex_desktop') || host).insertAdjacentElement('afterend', box);
+    return null;
+}
+
+// Reads the panel. Each group is one card name and its offers. Nothing goes into the page as HTML.
+function parseCardOffers(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const clean = node => (node?.textContent || '').replace(/\s+/g, ' ').trim();
+    return $$('.aop-payment-offer-list > div', doc)
+        .map(group => ({
+            card: clean(group.querySelector('[id^="aop-fullpayment-"] span.a-size-base, [id^="aop-installments-"] span.a-size-base')),
+            offers: [...new Set($$('li.aop-payment-voucher-details', group)
+                .map(node => clean(node).replace(/\s*T&Cs apply\.?$/i, ''))
+                .filter(Boolean))],
+        }))
+        .filter(group => group.card && group.offers.length)
+        // "SBI Credit Card - EMI" is an EMI offer. "Hide EMI options" hides those.
+        .filter(group => !(enabled('hideEmi') && /\bemi\b/i.test(group.card)));
+}
+
+// One request for each product page. The result stays in memory only, and only for this page.
+var cardOffers = { asin: null, state: 'none', groups: [] };
+
+function loadCardOffers(asin, url) {
+    if (cardOffers.asin === asin) return;
+    cardOffers = { asin, state: 'loading', groups: [] };
+    // Firefox: content.fetch sends the request as the page, with the page's cookies. Chrome does that with fetch.
+    const pageFetch = globalThis.content?.fetch ? globalThis.content.fetch.bind(globalThis.content) : fetch;
+    pageFetch(url, { credentials: 'include' })
+        .then(response => (response.ok ? response.text() : ''))
+        .then(html => { cardOffers = { asin, state: 'done', groups: html ? parseCardOffers(html) : [] }; })
+        .catch(() => { cardOffers = { asin, state: 'done', groups: [] }; })
+        .finally(() => {
+            // Draw the chips again with the card names. In "Disabled" mode, draw nothing.
+            if (isOff()) return;
+            removeFeatureNodes('bank');
+            safely('bank offers', showBankOffers);
+        });
+}
+
+function myCardList() {
+    return settings.myCards.split(',').map(card => card.trim().toLowerCase()).filter(Boolean);
+}
+
+function clickableChip(text, note, target) {
+    const chip = makeChip(text, 'good', note, 'bank');
+    chip.classList.add('az-chip-click');
+    chip.addEventListener('click', () => (target.querySelector('.a-declarative') || target).click());
+    return chip;
+}
+
+function cardOfferChips(box, groups, link) {
+    const cards = myCardList();
+    const total = groups.reduce((sum, group) => sum + group.offers.length, 0);
+    if (!cards.length) {
+        for (const group of groups.slice(0, 3)) box.append(clickableChip(`${group.card}: ${group.offers[0]}`, '', link.node));
+        return;
+    }
+    const mine = groups.filter(group => cards.some(card => group.card.toLowerCase().includes(card)));
+    if (!mine.length) {
+        box.append(makeChip('No bank offer for your cards', 'warn', `(${total} offer${total === 1 ? '' : 's'} for other cards)`, 'bank'));
+        return;
+    }
+    for (const group of mine) {
+        const more = group.offers.length - 1;
+        box.append(clickableChip(`Your card, ${group.card}: ${group.offers[0]}`, more > 0 ? `(+${more} more)` : '', link.node));
+    }
+}
+
+function showBankOffers() {
+    if (!enabled('showBankOffers') || $('[data-az-feature="bank"]')) return;
+    const offers = listedBankOffers();
+    const summaries = offers.length ? [] : carouselOfferCards();
+    const link = offers.length ? null : allOffersLink();
+    if (link) loadCardOffers(currentAsin(), link.url);
+    if (!offers.length && !summaries.length && !(link && cardOffers.groups.length)) return;
+
+    const box = el('div', { id: 'az-bank', 'data-az-feature': 'bank' });
+    if (!offers.length) {
+        // Cashback and other summary cards stay as they are. Bank offers come from the panel.
+        for (const { node, label } of summaries) {
+            if (/\bbank\b/i.test(label) && cardOffers.groups.length) continue;
+            box.append(clickableChip(label, '(click for details)', node));
+        }
+        if (link && cardOffers.groups.length) cardOfferChips(box, cardOffers.groups, link);
+        hideDuplicateOffers();
+    } else {
+        const cards = myCardList();
+        const mine = offers.filter(offer => cards.some(card => offer.toLowerCase().includes(card)));
+        if (cards.length && mine.length) {
+            for (const offer of mine) box.append(makeChip(`Your card: ${offer}`, 'good', '', 'bank'));
+        } else if (cards.length) {
+            box.append(makeChip('No bank offer for your cards', 'warn', `(${offers.length} offer${offers.length === 1 ? '' : 's'} for other cards)`, 'bank'));
+        } else {
+            for (const offer of offers.slice(0, 3)) box.append(makeChip(offer, 'good', '', 'bank'));
+        }
+    }
+    if (!box.childElementCount) return;
+    // Put the offers below the buttons when the buttons are in the middle column.
+    const actions = $('#az-actions');
+    const anchor = actions && actions.closest('#centerCol') ? actions : centerPriceBlock();
+    anchor?.insertAdjacentElement('afterend', box);
+}
+
+// The blue chips repeat Amazon's "Offers" heading and summary cards. Thus, hide those.
+// Keep "See all offers & discounts": it is in the same box, below the cards.
+function hideDuplicateOffers() {
+    for (const node of $$('#offersHeader_feature_div, #smx_feature_div .cardification-multi-select-carousel')) {
+        node.classList.add('az-offers-dup');
+    }
 }
 
 defineFeature({
     name: 'bank offers',
-    keys: ['showBankOffers', 'myCards'],
+    keys: ['showBankOffers', 'myCards', 'minimalProductUi'],
     run: showBankOffers,
-    reset() { releaseClaims('azBank'); removeFeatureNodes('bank'); },
+    reset() { releaseClaims('azBank'); removeFeatureNodes('bank'); removeClass('az-offers-dup'); },
 });
 
 // ---------- Buy box buttons: price history and reviews ----------
@@ -185,12 +355,16 @@ function currentAsin() {
 }
 
 // The price history and reviews buttons share one row below the price.
+// Minimal Product UI on: the row goes below the main price. Off: below the buy box price.
 function actionsRow() {
     const existing = $('#az-actions');
     if (existing && existing.isConnected) return existing;
-    const target = $('#corePrice_feature_div') || $('#apex_desktop');
+    const target = enabled('minimalProductUi')
+        ? centerPriceBlock()
+        : $('#rightCol #corePrice_feature_div, #desktop_buybox #corePrice_feature_div, #buybox #corePrice_feature_div') || $('#corePrice_feature_div') || $('#apex_desktop');
     if (!target) return null;
     const row = el('div', { id: 'az-actions', 'data-az-feature': 'actions' });
+    // "afterend" puts the row directly below the target. Thus, bank offers there stay below the row.
     target.insertAdjacentElement('afterend', row);
     return row;
 }
@@ -239,7 +413,7 @@ function addPriceHistoryButtons() {
 
 defineFeature({
     name: 'price history',
-    keys: ['priceHistoryButton'],
+    keys: ['priceHistoryButton', 'minimalProductUi'],
     run: addPriceHistoryButtons,
     reset() { $('#az-history-row')?.remove(); pruneActionsRow(); },
 });
@@ -309,7 +483,7 @@ function addReviewsButton() {
 
 defineFeature({
     name: 'reviews button',
-    keys: ['reviewsButton'],
+    keys: ['reviewsButton', 'minimalProductUi'],
     run: addReviewsButton,
     reset() { $('#az-reviews')?.remove(); pruneActionsRow(); },
 });
@@ -382,16 +556,23 @@ function collectFees() {
     return byLabel;
 }
 
-// The chip shows in two places: next to the price, and below the price block.
+// The chip shows in two places: in the buy box, and in the middle column.
+// In the middle column, it goes directly after the big price, on the same line.
 var FEE_ANCHORS = [
-    { selector: '.apex-core-price-identifier', cls: 'az-fee-inline' },
-    { selector: '#corePriceDisplay_desktop_feature_div', cls: 'az-fee-block' },
+    { selector: '#rightCol .apex-core-price-identifier, #desktop_buybox .apex-core-price-identifier, #buybox .apex-core-price-identifier', place: 'append' },
+    { selector: '#centerCol .apex-pricetopay-value, #centerCol .priceToPay', place: 'after' },
 ];
+
+function feeChipAt(anchor, place) {
+    if (place === 'append') return anchor.querySelector(':scope > .az-chip-fee');
+    const next = anchor.nextElementSibling;
+    return next && next.matches('.az-chip-fee') ? next : null;
+}
 
 function showHiddenFees() {
     if (!enabled('showHiddenFees')) return;
     const fees = collectFees();
-    if (!fees.size) { for (const chip of $$('.az-chip-fee')) chip.remove(); return; }
+    if (!fees.size) { removeFeatureNodes('fees'); return; }
 
     const total = [...fees.values()].reduce((sum, amount) => sum + amount, 0);
     const labels = [...fees.keys()];
@@ -399,19 +580,20 @@ function showHiddenFees() {
         ? `+${formatFee(total)} ${labels[0]} fee`
         : `+${formatFee(total)} in fees (${labels.join(', ')})`;
 
-    for (const { selector, cls } of FEE_ANCHORS) {
+    for (const { selector, place } of FEE_ANCHORS) {
         const anchor = $(selector);
         if (!anchor) continue;
-        let chip = anchor.querySelector(':scope > .az-chip-fee');
+        let chip = feeChipAt(anchor, place);
         if (chip) {
             if (chip.dataset.text !== text) { chip.textContent = text; chip.dataset.text = text; }
             continue;
         }
         chip = makeChip(text, 'fee', '', 'fees');
-        chip.classList.add(cls);
+        chip.classList.add('az-fee-inline');
         chip.dataset.text = text;
         chip.title = 'Charges that Amazon adds to the listed price';
-        anchor.append(chip);
+        if (place === 'append') anchor.append(chip);
+        else anchor.insertAdjacentElement('afterend', chip);
     }
 }
 
@@ -419,7 +601,57 @@ defineFeature({
     name: 'extra fees',
     keys: ['showHiddenFees'],
     run: showHiddenFees,
-    reset() { for (const chip of $$('.az-chip-fee')) chip.remove(); },
+    reset() { removeFeatureNodes('fees'); },
+});
+
+// ---------- Delivery text in the buy box ----------
+
+// Amazon's line: "₹59 delivery <b>Tuesday, 13 October</b>. Order within 12 hrs. Details".
+// A charged delivery: the fee chips show the charge, so the "₹59 delivery" words go.
+// All deliveries: the text goes on three lines: "FREE delivery", the date, "Order within ...".
+// The date is the important part. Thus, it is bigger.
+var DELIVERY_MESSAGES = '[id^="mir-layout-DELIVERY_BLOCK-slot-PRIMARY_DELIVERY_MESSAGE"] > span';
+
+function lineBreak() {
+    return el('br', { 'data-az-feature': 'delivery-lines' });
+}
+
+function tidyDeliveryText() {
+    if (!enabled('showHiddenFees')) return;
+    for (const message of $$(DELIVERY_MESSAGES)) {
+        const date = message.querySelector(':scope > .a-text-bold');
+        if (!date || !claim(message, 'azDelivery')) continue;
+        date.classList.add('az-delivery-date');
+
+        const leading = [];
+        for (let node = message.firstChild; node && node !== date; node = node.nextSibling) leading.push(node);
+        const leadText = leading.map(node => node.textContent).join(' ').replace(/\s+/g, ' ').trim();
+        if (scanFees(leadText).length) {
+            for (const node of leading) hideText(node, 'delivery');
+        } else if (leadText) {
+            date.before(lineBreak());
+        }
+
+        // Keep the full stop at the end of the date line.
+        const rest = date.nextSibling;
+        if (!rest || !(rest.textContent || '').trim()) continue;
+        if (rest.nodeType === Node.TEXT_NODE && rest.textContent.startsWith('.')) rest.splitText(1).before(lineBreak());
+        else date.after(lineBreak());
+    }
+}
+
+defineFeature({
+    name: 'delivery text',
+    keys: ['showHiddenFees'],
+    run: tidyDeliveryText,
+    reset() {
+        const messages = $$('[data-az-delivery]');
+        removeFeatureNodes('delivery-lines');
+        showHiddenText('delivery');
+        for (const message of messages) message.normalize();
+        removeClass('az-delivery-date');
+        releaseClaims('azDelivery');
+    },
 });
 
 // ---------- Coupons ----------
@@ -438,8 +670,14 @@ var COUPON_ROOTS = [
     '#couponFeature_feature_div', '#applicablePromotionList_feature_div', '#vpcButton',
 ].join(', ');
 
+// The 2026 coupon card: "Coupon Discount, Save 5% now" and an "Apply Coupon" button.
+// It has scripts inside, so its text is long. Thus, it does not go through the text check.
+var COUPON_CARD = '#coupons-card-feature';
+
 function couponBlocks() {
     const found = new Set();
+    const card = $(COUPON_CARD);
+    if (card && card.querySelector('#coupons-card-apply-button, [id^="coupons-card-heading"]')) found.add(card);
     for (const root of $$(COUPON_ROOTS)) {
         const text = (root.textContent || '').replace(/\s+/g, ' ').trim();
         if (!text || text.length > 300 || !COUPON_TEXT.test(text)) continue;
@@ -453,6 +691,9 @@ function couponBlocks() {
 }
 
 function couponControl(box) {
+    // The card button is an <input> with no text. Thus, the label check below cannot find it.
+    const cardButton = box.querySelector('#coupons-card-apply-button .a-button-input, #coupons-card-apply-button');
+    if (cardButton) return cardButton;
     const checkbox = box.querySelector('input[type=checkbox]');
     if (checkbox && !checkbox.disabled) return checkbox;
     for (const node of $$('a, button, [role="button"], .a-button-input, .a-declarative', box)) {
@@ -462,16 +703,24 @@ function couponControl(box) {
     return null;
 }
 
+// The coupon card always has a hidden "Coupon Applied" text. Thus, read its status attribute.
+function couponIsApplied(box) {
+    const status = box.querySelector('[data-couponclippedstatus]');
+    if (status) return status.getAttribute('data-couponclippedstatus') === 'true';
+    return /collected|applied/i.test(box.textContent || '');
+}
+
 function highlightCoupons() {
     if (!enabled('highlightCoupon')) return;
     const autoApply = enabled('autoApplyCoupon') && Date.now() - PAGE_LOAD_AT <= COUPON_GRACE_MS;
     for (const box of couponBlocks()) {
         if (claim(box, 'azCoupon')) box.classList.add('az-coupon');
+        if (box.matches(COUPON_CARD)) box.classList.add('az-coupon-card');
         if (!autoApply) continue;
         const control = couponControl(box);
         if (!control) continue;
         if (control.type === 'checkbox' && control.checked) continue;
-        if (/collected|applied/i.test(box.textContent || '')) continue;
+        if (couponIsApplied(box)) continue;
         // This claim is not released by a reset. Thus, the extension clicks a coupon one time only.
         if (!claim(control, 'azCouponClick')) continue;
         control.click();
@@ -483,7 +732,7 @@ defineFeature({
     name: 'coupons',
     keys: ['highlightCoupon', 'autoApplyCoupon'],
     run: highlightCoupons,
-    reset() { removeClass('az-coupon'); removeClass('az-coupon-auto'); releaseClaims('azCoupon'); },
+    reset() { removeClass('az-coupon'); removeClass('az-coupon-auto'); removeClass('az-coupon-card'); releaseClaims('azCoupon'); },
 });
 
 // ---------- Section order ----------

@@ -21,6 +21,8 @@ BASE = "https://www.amazon.in"
 PAGES = {
     "/mock.css": ("mock.css", "text/css"),
     "/dp/B0MOUSY001": ("product.html", "text/html"),
+    "/dp/B0MOUSY010": ("product-2026.html", "text/html"),
+    "/hz/smx/offerApplication/secondaryView": ("offers.html", "text/html"),
     "/s": ("search.html", "text/html"),
     "/gp/cart/view.html": ("cart.html", "text/html"),
     "/hz/wishlist/ls": ("wishlist.html", "text/html"),

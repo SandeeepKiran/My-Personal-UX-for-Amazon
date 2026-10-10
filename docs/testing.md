@@ -32,6 +32,8 @@ as Amazon, and they use Mousy test data:
 |---|---|---|
 | `/dp/B0MOUSY001` | `product.html` | Mousy Cold Brew Coffee Beans, ₹899, ₹40 delivery, coupon, rails |
 | `/s?k=mousy+coffee` | `search.html` | 2 sponsored + 7 Mousy products |
+| `/dp/B0MOUSY010` | `product-2026.html` | The 2026 layout: buy box price, seller card, coupon card, offers carousel, trust icons |
+| `/hz/smx/offerApplication/secondaryView` | `offers.html` | Amazon's "See all offers" panel: Mousy Bank and HDFC card offers |
 | `/gp/cart/view.html` | `cart.html` | 2 items, one with a ₹40 delivery charge |
 | `/hz/wishlist/ls` | `wishlist.html` | Mousy's Wishlist, Mousy's Gift Ideas, a bad `javascript:` link |
 
@@ -41,16 +43,19 @@ All pages include `nav.html` ("Hello, Mousy") and `mock.css`.
 
 | Test | It checks that… |
 |---|---|
-| `test_popup_groups_settings_by_amazon_area` | the popup has 6 groups and 24 switches |
-| `test_popup_footer_shows_version_then_credit` | the footer shows `v5.0.0`, then "Made with ❤️ by Mousy!" |
+| `test_popup_groups_settings_by_amazon_area` | the popup has 6 groups and 26 switches |
+| `test_popup_footer_shows_version_then_credit` | the footer shows `v5.1.0`, then "Made with ❤️ by Mousy!" |
 | `test_popup_change_reaches_open_page` | a switch in the popup changes an open page |
 | `test_product_page_features` | the seller, fee, history, reviews and coupon features work |
+| `test_product_page_2026_layout` | on the 2026 layout: brand seller chip, fees, buttons in the buy box, coupon card applied, offers chip, trust icons hidden |
+| `test_bank_offers_for_my_cards` | with "hdfc" in My cards, only the HDFC offer shows |
+| `test_minimal_ui_off_puts_buttons_in_buy_box` | with Minimal Product UI off, the buttons go in the buy box |
 | `test_account_menu_uses_name_and_safe_wishlists` | the menu shows "Mousy" and drops the `javascript:` link |
 | `test_explore_menu_has_no_amazon_fresh` | Amazon Fresh is not in the Explore menu |
-| `test_page_is_quiet_after_load` | the extension makes 0 page changes when nothing happens |
+| `test_page_is_quiet_after_load` | the extension makes 0 page changes when nothing happens (3 pages) |
 | `test_alt_a_opens_panel_and_disabled_mode_removes_everything` | Alt+A works, and Disabled removes all changes |
 | `test_panel_groups_collapse_and_stay_collapsed` | a folded group stays folded after a reload |
-| `test_search_results` | unit prices and "few ratings" are correct |
+| `test_search_results` | unit prices, "few ratings" and the delivery fee chip are correct |
 | `test_cashback_tracks_items_added_during_session` | Add to Cart during a session marks the item |
 
 ## 5. Manual checks before a release

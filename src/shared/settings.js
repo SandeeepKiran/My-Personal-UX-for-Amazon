@@ -27,7 +27,7 @@ var AZ = (() => {
             cards: true,
             toggles: [
                 ['biggerPrice', 'Bigger price', 'Makes the main price in the buy box larger.'],
-                ['showHiddenFees', 'Warn about extra fees', 'Shows delivery, handling and other charges next to the price and in the cart.'],
+                ['showHiddenFees', 'Warn about extra fees', 'Shows delivery, handling and other charges next to the price, in search results and in the cart.'],
                 ['highlightCoupon', 'Highlight coupons', 'Puts a green box around coupons, because they are easy to miss.'],
                 ['autoApplyCoupon', 'Apply coupons automatically', 'Applies the coupon when the page opens. If you remove a coupon, it stays removed.'],
                 ['showBankOffers', 'Show bank offers', 'Shows bank offers below the price.', true],
@@ -37,7 +37,8 @@ var AZ = (() => {
         {
             id: 'tools', icon: '🧰', title: 'Product page: helpers',
             toggles: [
-                ['showSellerBadge', 'Show the seller', 'Tells you if Amazon or a third-party seller sells the product.'],
+                ['minimalProductUi', 'Minimal Product UI (v2, new)', 'On: the price history and reviews buttons go below the main price, with the bank offers. Off: they go in the buy box, next to the price.'],
+                ['showSellerBadge', 'Show the seller', 'Tells you if Amazon, the brand or a third-party seller sells the product.'],
                 ['priceHistoryButton', 'Price history buttons', 'Adds a Keepa button. On amazon.in, also adds a PriceHistory button.'],
                 ['reviewsButton', 'Reviews button', 'Shows the rating and goes to the customer reviews.'],
             ],
@@ -50,6 +51,7 @@ var AZ = (() => {
                 ['hideProductVideos', 'Hide the video rail', 'Hides the "Videos for this product" rail.'],
                 ['hideBrandCarousel', 'Hide the brand rail', 'Hides the "Brands in this category on Amazon" rail.'],
                 ['hideFeedbackBlock', 'Hide the Feedback block', 'Hides the feedback form in Product information.'],
+                ['hideTrustIcons', 'Hide the trust icons', 'Hides the row of icons such as "10 days Replacement" and "Secure transaction".'],
                 ['reorderDetails', 'Specs before recommendations', 'Moves the box contents, product details and brand card above the related products.'],
             ],
         },
@@ -57,7 +59,7 @@ var AZ = (() => {
             id: 'cart', icon: '🛒', title: 'Add to cart and cart',
             toggles: [
                 ['fixSubscribeSave', 'Choose one-time purchase', 'Changes a preselected Subscribe & Save to a one-time purchase.'],
-                ['dismissWarranty', 'Decline protection plans', 'Closes the protection plan pop-up after Add to Cart.'],
+                ['dismissWarranty', 'Decline protection plans', 'Closes the protection plan pop-up after Add to Cart, and hides the protection plan boxes in the buy box.'],
                 ['ewcCollapse', 'Fold the cart side panel', 'Puts the cart panel on the right behind a 🛒 tab.'],
                 ['cashkaroWatch', 'Cashback watch', 'Tells you if a cashback link tracks your visit and your cart items.', true],
             ],

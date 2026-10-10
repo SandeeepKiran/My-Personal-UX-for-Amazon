@@ -34,6 +34,10 @@ Prefer a stable mark to an exact id:
   must only read and show. It does not run on checkout pages.
 - **Do not trust page text.** Wishlist names and the account name come from the page.
   Put them in with `textContent` only.
+- **One extra request only.** The bank offers feature loads Amazon's "See all offers"
+  panel (`/hz/smx/offerApplication/secondaryView`) one time for each product page. It is
+  a GET to amazon.in, the same as a click on the panel. It reads the HTML with
+  `DOMParser` and never puts it in the page. Do not add other requests.
 
 ## 3. Cashback logic is easy to get wrong
 
