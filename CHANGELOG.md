@@ -8,6 +8,22 @@ Each `## [x.y.z]` section is the text for the GitHub release with the tag `vx.y.
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-10-17
+
+### Added
+
+- **Five new clutter switches** in "Product page: clutter". All are on by default.
+  - **Hide "Frequently bought together"**: the bundle with "Add all to Cart".
+  - **Hide the Top Brand card**: the card with the brand ratings, orders and years on Amazon.
+  - **Hide "From the brand"**: the brand story pictures, and the "From the Brand" tab that links to them.
+  - **Hide the Amazon ad banner**: the banner at the top, such as "Amazon Music: 30 days free".
+  - **Hide the Amazon Business ad**: "Sign in/Create a free business account" below the price.
+
+### Changed
+
+- **Hide recommendation rails** also hides "Relevant items customers are likely to buy" and
+  "Related items bought by customers". It now hides the full block, not only the carousel.
+
 ## [5.1.0] - 2026-10-11
 
 The product page now fits Amazon's 2026 layout. Delivery fees show in search results,

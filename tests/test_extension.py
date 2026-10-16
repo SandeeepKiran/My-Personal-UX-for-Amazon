@@ -39,7 +39,7 @@ def test_popup_groups_settings_by_amazon_area(harness):
         "Search results", "Product page: price and offers", "Product page: helpers",
         "Product page: clutter", "Add to cart and cart", "Top bar",
     ]
-    assert popup.locator(".az-switch").count() == 26
+    assert popup.locator(".az-switch").count() == 31
 
 
 def test_popup_footer_shows_version_then_credit(harness):
@@ -103,6 +103,24 @@ def test_product_page_2026_layout(harness):
     assert not page.locator("#offersHeader_feature_div").is_visible()
     assert not page.locator("#smx-secondary-view-id").is_visible()
     assert page.locator("#cardification-secondary-view-id").is_visible()
+    # Clutter: Amazon's own ads, the bundle, the rails and the brand blocks go. The other tabs stay.
+    for hidden in ("#desktop-dp-ilm_feature_div_0", "#heroQuickPromo_feature_div", "#sims-productBundle_feature_div_0",
+                   "#sims-simsContainer_feature_div_0", "#sims-simsContainer_feature_div_1",
+                   "#aplusBrandStory_feature_div", ".btfSubNavDesktopFromTheBrandTab", "#brandSnapshot_feature_div"):
+        assert not page.locator(hidden).is_visible(), hidden
+    assert page.locator(".btfSubNavDesktopReviewsTab").is_visible()
+
+
+def test_clutter_switch_off_shows_the_block_again(harness):
+    page = harness.open("/dp/B0MOUSY010")
+    assert not page.locator("#brandSnapshot_feature_div").is_visible()
+    popup = harness.popup()
+    popup.locator("#tab-settings").click()
+    popup.locator('[data-az-key="hideBrandSnapshot"]').click()
+    page.wait_for_timeout(600)
+    assert page.locator("#brandSnapshot_feature_div").is_visible()
+    # The other switches keep their blocks hidden.
+    assert not page.locator("#aplusBrandStory_feature_div").is_visible()
 
 
 def test_bank_offers_for_my_cards(harness):

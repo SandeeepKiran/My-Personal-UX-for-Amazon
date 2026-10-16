@@ -87,11 +87,12 @@ defineFeature({
 // ---------- Rails found by their heading ----------
 
 // Amazon changes the ids of these blocks. Thus, find the heading text, then hide the block around it.
+// "container" is a selector or a list of selectors. In a list, the first selector that finds a block wins.
 function hideByHeading(pattern, tag, className, container) {
     for (const heading of $$('h2, h3')) {
         if (!claim(heading, tag)) continue;
         if (!pattern.test((heading.textContent || '').trim())) continue;
-        const block = heading.closest(container);
+        const block = [].concat(container).map(selector => heading.closest(selector)).find(Boolean);
         if (!block || block === document.body) continue;
         // Do not hide the Keepa extension box, if the user has it.
         if (block.querySelector('#keepaContainer, [id^="keepa"], [class*="keepa"]')) continue;
@@ -99,13 +100,13 @@ function hideByHeading(pattern, tag, className, container) {
     }
 }
 
-var CAROUSEL_HEADINGS = /inspired by your browsing|related to items you|customers who bought|customers also|you might also like|based on your recent|recommended based on|explore more|top picks for you/i;
+var CAROUSEL_HEADINGS = /inspired by your browsing|related to items you|customers who bought|customers also|you might also like|based on your recent|recommended based on|explore more|top picks for you|relevant items customers|related items bought/i;
 
 defineFeature({
     name: 'carousels',
     keys: ['hideCarousels'],
     run() {
-        if (enabled('hideCarousels')) hideByHeading(CAROUSEL_HEADINGS, 'azCarousel', 'az-declutter', '[data-cel-widget], .a-carousel-container, .a-section');
+        if (enabled('hideCarousels')) hideByHeading(CAROUSEL_HEADINGS, 'azCarousel', 'az-declutter', ['[id^="sims-simsContainer_feature_div"]', '[data-cel-widget], .a-carousel-container, .a-section']);
     },
     reset() { removeClass('az-declutter'); releaseClaims('azCarousel'); },
 });
@@ -173,6 +174,44 @@ defineFeature({
     },
     reset() { removeClass('az-trust-icons'); releaseClaims('azTrustIcons'); },
 });
+
+// ---------- Blocks with a fixed id ----------
+
+// Each switch hides Amazon blocks that have a fixed id. The attribute data-az-hidden-by
+// hides the block (see content.css) and holds the key, so that reset() finds its own blocks.
+// "heading" is a second way to find the block, if Amazon changes the id.
+var FIXED_BLOCKS = [
+    { key: 'hideBoughtTogether', name: 'frequently bought together', selectors: '[id^="sims-productBundle_feature_div"], #sims-fbt',
+      heading: /^frequently bought together$/i, container: '[data-cel-widget]' },
+    { key: 'hideBrandSnapshot', name: 'top brand card', selectors: '#brandSnapshot_feature_div' },
+    // The tab in the bar below the product goes too, because it links to the hidden block.
+    { key: 'hideBrandStory', name: 'from the brand', selectors: '#aplusBrandStory_feature_div, .btfSubNavDesktopFromTheBrandTab' },
+    // "ILM" is Amazon's name for its own ads on the product page, for example Amazon Music.
+    { key: 'hidePromoBanner', name: 'amazon ad banner', selectors: '[id^="desktop-dp-ilm_feature_div"]' },
+    { key: 'hideBusinessPromo', name: 'amazon business ad', selectors: '#heroQuickPromo_feature_div' },
+];
+
+function hideFixedBlock(node, key) {
+    if (node && node !== document.body && !node.dataset.azHiddenBy) node.dataset.azHiddenBy = key;
+}
+
+for (const block of FIXED_BLOCKS) {
+    defineFeature({
+        name: block.name,
+        keys: [block.key],
+        run() {
+            if (!enabled(block.key)) return;
+            for (const node of $$(block.selectors)) hideFixedBlock(node, block.key);
+            if (!block.heading) return;
+            for (const heading of $$('h2, h3')) {
+                if (block.heading.test((heading.textContent || '').trim())) hideFixedBlock(heading.closest(block.container), block.key);
+            }
+        },
+        reset() {
+            for (const node of $$(`[data-az-hidden-by="${block.key}"]`)) node.removeAttribute('data-az-hidden-by');
+        },
+    });
+}
 
 // ---------- EMI and bank offers (amazon.in) ----------
 

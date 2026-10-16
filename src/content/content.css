@@ -242,6 +242,7 @@ html[data-az="simple"] .az-video,
 html[data-az="simple"] .az-brands,
 html[data-az="simple"] .az-feedback,
 html[data-az="simple"] .az-trust-icons,
+html[data-az="simple"] [data-az-hidden-by],
 html[data-az="simple"] .az-offers-dup,
 html[data-az="simple"] .az-protection-plan,
 html[data-az="simple"] .az-hidden-text { display: none !important; }

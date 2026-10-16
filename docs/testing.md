@@ -44,7 +44,7 @@ All pages include `nav.html` ("Hello, Mousy") and `mock.css`.
 | Test | It checks that… |
 |---|---|
 | `test_popup_groups_settings_by_amazon_area` | the popup has 6 groups and 26 switches |
-| `test_popup_footer_shows_version_then_credit` | the footer shows `v5.1.0`, then "Made with ❤️ by Mousy!" |
+| `test_popup_footer_shows_version_then_credit` | the footer shows `v5.2.0`, then "Made with ❤️ by Mousy!" |
 | `test_popup_change_reaches_open_page` | a switch in the popup changes an open page |
 | `test_product_page_features` | the seller, fee, history, reviews and coupon features work |
 | `test_product_page_2026_layout` | on the 2026 layout: brand seller chip, fees, buttons in the buy box, coupon card applied, offers chip, trust icons hidden |

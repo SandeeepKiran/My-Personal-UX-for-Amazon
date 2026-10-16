@@ -40,10 +40,15 @@ All switches are on by default. "IN" means amazon.in only.
 |---|---|---|
 | `stripUrgency` | Remove urgency text | urgency (`product.js`) |
 | `hideCarousels` | Hide recommendation rails | carousels (`product.js`) |
+| `hideBoughtTogether` | Hide "Frequently bought together" | frequently bought together (`product.js`) |
 | `hideProductVideos` | Hide the video rail | product videos (`product.js`) |
 | `hideBrandCarousel` | Hide the brand rail | brand rail (`product.js`) |
 | `hideFeedbackBlock` | Hide the Feedback block | feedback block (`product.js`) |
 | `hideTrustIcons` | Hide the trust icons | trust icons (`product.js`) |
+| `hideBrandSnapshot` | Hide the Top Brand card | top brand card (`product.js`) |
+| `hideBrandStory` | Hide "From the brand" | from the brand (`product.js`) |
+| `hidePromoBanner` | Hide the Amazon ad banner | amazon ad banner (`product.js`) |
+| `hideBusinessPromo` | Hide the Amazon Business ad | amazon business ad (`product.js`) |
 | `reorderDetails` | Specs before recommendations | section order (`product.js`) |
 
 ## 🛒 Add to cart and cart
