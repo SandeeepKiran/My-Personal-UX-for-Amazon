@@ -39,6 +39,29 @@ function sameName(a, b) {
     return Boolean(x) && x === y;
 }
 
+// Words that only name a company form. "Mousy Innovations Ltd" is the company of
+// the brand "Mousy". "Traders", "Retail" and "Store" are not here: resellers use them.
+var COMPANY_WORDS = new Set([
+    'pvt', 'private', 'ltd', 'limited', 'llp', 'llc', 'inc', 'co', 'company', 'corp', 'corporation',
+    'india', 'innovations', 'industries', 'technologies', 'technology', 'tech', 'solutions',
+    'international', 'global', 'brands', 'products', 'consumer', 'lifestyle', 'ventures', 'group',
+    'labs', 'manufacturing', 'healthcare', 'foods', 'beverages', 'appliances', 'electronics',
+]);
+
+// True when the seller is the brand name plus company words only.
+function sellerIsBrandCompany(seller, brand) {
+    const words = value => value.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
+    const sellerWords = words(seller);
+    const brandWords = words(brand);
+    // A short or generic brand gives false matches.
+    if (!brandWords.length || brandWords.join('').length < 4 || brandWords.join('') === 'generic') return false;
+    if (sellerWords.length <= brandWords.length) return false;
+    if (brandWords.some((word, i) => sellerWords[i] !== word)) return false;
+    return sellerWords.slice(brandWords.length).every(word => COMPANY_WORDS.has(word));
+}
+
+function sellerIsBrand(seller, brand) { return sameName(seller, brand) || sellerIsBrandCompany(seller, brand); }
+
 function annotateSeller() {
     if (!enabled('showSellerBadge')) return;
     const buyBox = $('#desktop_buybox, #buybox, #rightCol');
@@ -50,7 +73,7 @@ function annotateSeller() {
     const isAmazon = /amazon|cloudtail|appario/i.test(name);
     const chip = isAmazon
         ? makeChip(`Sold by ${name}`, 'good', '', 'seller')
-        : sameName(name, brandName())
+        : sellerIsBrand(name, brandName())
             ? makeChip(`Sold by the brand: ${name}`, 'brand', '(the brand handles returns)', 'seller')
             : makeChip(`Third-party seller: ${name}`, 'warn', '(the seller handles returns)', 'seller');
     const target = $('#apex_desktop') || $('#corePrice_feature_div') || buyBox.firstElementChild;
@@ -100,15 +123,52 @@ function hideByHeading(pattern, tag, className, container) {
     }
 }
 
-var CAROUSEL_HEADINGS = /inspired by your browsing|related to items you|customers who bought|customers also|you might also like|based on your recent|recommended based on|explore more|top picks for you|relevant items customers|related items bought/i;
+var CAROUSEL_HEADINGS = /inspired by your browsing|related to items you|customers who bought|customers also|you might also like|based on your recent|recommended based on|explore more|top picks for you|relevant items customers|related items bought|featured items to consider/i;
+
+// Amazon adds new rail names often, so a list of headings always misses some.
+// Thus, also find rails by the page structure (checked on amazon.in, 2026-10):
+// #ppd is the product itself. The blocks after it in #dp-container are rails and product
+// content. #rhf at the bottom has only rails ("Best Sellers in ...", browsing history).
+var RAIL_BLOCK_ID = /^(sims-|sp_detail|sp-|desktop-dp-sims)/i;
+var RAIL_CAROUSEL = '.a-carousel-container, [data-a-carousel-options]';
+// The product's own content. Keep it, also when it has a carousel (A+ pictures, review photos).
+var PRODUCT_CONTENT_ID = /aplus|review|description|details|techspec|productfacts|productoverview|featurebullets|feature-bullets|importantinformation|video|manufacturer|brandstory/i;
+// These blocks have their own switches: hideBoughtTogether and hideBrandCarousel.
+var RAIL_OWN_SWITCH_ID = /^sims-(productBundle|discoveryAndInspiration)/i;
+
+function railBlocks() {
+    const blocks = [];
+    for (const block of $$('#dp-container > [id], #dp-container > [data-cel-widget]')) {
+        const id = block.id || block.getAttribute('data-cel-widget') || '';
+        if (block.id === 'ppd' || RAIL_OWN_SWITCH_ID.test(id) || PRODUCT_CONTENT_ID.test(id)) continue;
+        if (RAIL_BLOCK_ID.test(id) || block.querySelector(RAIL_CAROUSEL)) blocks.push(block);
+    }
+    for (const carousel of $$(RAIL_CAROUSEL, $('#rhf') || document.createElement('div'))) {
+        blocks.push(carousel.closest('#rhf [data-cel-widget]') || carousel);
+    }
+    return blocks;
+}
+
+function hideRailsByStructure() {
+    for (const block of railBlocks()) {
+        // The video rail and the brand rail have their own switches.
+        const heading = (block.querySelector('h2, h3')?.textContent || '').trim();
+        if (VIDEO_HEADING.test(heading) || BRAND_HEADING.test(heading)) continue;
+        // Do not hide the Keepa extension box, if the user has it.
+        if (block.querySelector('#keepaContainer, [id^="keepa"], [class*="keepa"]')) continue;
+        if (claim(block, 'azRail')) block.classList.add('az-declutter');
+    }
+}
 
 defineFeature({
     name: 'carousels',
     keys: ['hideCarousels'],
     run() {
-        if (enabled('hideCarousels')) hideByHeading(CAROUSEL_HEADINGS, 'azCarousel', 'az-declutter', ['[id^="sims-simsContainer_feature_div"]', '[data-cel-widget], .a-carousel-container, .a-section']);
+        if (!enabled('hideCarousels')) return;
+        hideByHeading(CAROUSEL_HEADINGS, 'azCarousel', 'az-declutter', ['[id^="sims-simsContainer_feature_div"]', '[data-cel-widget], .a-carousel-container, .a-section']);
+        hideRailsByStructure();
     },
-    reset() { removeClass('az-declutter'); releaseClaims('azCarousel'); },
+    reset() { removeClass('az-declutter'); releaseClaims('azCarousel', 'azRail'); },
 });
 
 var VIDEO_HEADING = /^(videos? for this product|product videos?|videos)$/i;
@@ -305,9 +365,15 @@ function loadCardOffers(asin, url) {
         });
 }
 
+// Users type names in many ways: "HDFC", "hdfc", "Amazon Pay" or "AmazonPay".
+// Thus, compare lowercase letters and digits only.
+function cardKey(text) { return (text || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
 function myCardList() {
-    return settings.myCards.split(',').map(card => card.trim().toLowerCase()).filter(Boolean);
+    return settings.myCards.split(',').map(cardKey).filter(Boolean);
 }
+
+function isMyCard(text, cards) { return cards.some(card => cardKey(text).includes(card)); }
 
 function clickableChip(text, note, target) {
     const chip = makeChip(text, 'good', note, 'bank');
@@ -323,7 +389,7 @@ function cardOfferChips(box, groups, link) {
         for (const group of groups.slice(0, 3)) box.append(clickableChip(`${group.card}: ${group.offers[0]}`, '', link.node));
         return;
     }
-    const mine = groups.filter(group => cards.some(card => group.card.toLowerCase().includes(card)));
+    const mine = groups.filter(group => isMyCard(group.card, cards));
     if (!mine.length) {
         box.append(makeChip('No bank offer for your cards', 'warn', `(${total} offer${total === 1 ? '' : 's'} for other cards)`, 'bank'));
         return;
@@ -353,7 +419,7 @@ function showBankOffers() {
         hideDuplicateOffers();
     } else {
         const cards = myCardList();
-        const mine = offers.filter(offer => cards.some(card => offer.toLowerCase().includes(card)));
+        const mine = offers.filter(offer => isMyCard(offer, cards));
         if (cards.length && mine.length) {
             for (const offer of mine) box.append(makeChip(`Your card: ${offer}`, 'good', '', 'bank'));
         } else if (cards.length) {
@@ -735,18 +801,23 @@ function couponControl(box) {
     if (cardButton) return cardButton;
     const checkbox = box.querySelector('input[type=checkbox]');
     if (checkbox && !checkbox.disabled) return checkbox;
+    // A wrapper and the link in it can both match. For example, the cart popover wrapper
+    // contains "Save 2%" and "Clip Coupon". Thus, use the last match, which is the innermost.
+    let found = null;
     for (const node of $$('a, button, [role="button"], .a-button-input, .a-declarative', box)) {
         const label = (node.textContent || node.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
-        if (label.length < 60 && COUPON_ACTION.test(label)) return node;
+        if (label.length < 60 && COUPON_ACTION.test(label) && (!found || found.contains(node))) found = node;
     }
-    return null;
+    return found;
 }
 
 // The coupon card always has a hidden "Coupon Applied" text. Thus, read its status attribute.
+// The cart box always has a hidden "Coupon Collected" text. Thus, read only the visible
+// text (innerText). textContent also gives hidden text.
 function couponIsApplied(box) {
     const status = box.querySelector('[data-couponclippedstatus]');
     if (status) return status.getAttribute('data-couponclippedstatus') === 'true';
-    return /collected|applied/i.test(box.textContent || '');
+    return /collected|applied/i.test(box.innerText ?? box.textContent ?? '');
 }
 
 function highlightCoupons() {

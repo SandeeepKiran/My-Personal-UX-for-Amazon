@@ -79,6 +79,15 @@ def test_product_page_2026_layout(harness):
     page = harness.open("/dp/B0MOUSY010")
     # The brand (MousyLatest) and the seller (Mousy Latest) are the same.
     assert page.locator('[data-az-feature="seller"]').inner_text().startswith("Sold by the brand: Mousy Latest")
+    # A company of the brand ("Mousy Innovations Pvt Ltd") is the brand too.
+    page.evaluate("""() => {
+        document.querySelector('[data-az-feature="seller"]').remove();
+        delete document.querySelector('#desktop_buybox, #buybox, #rightCol').dataset.azSeller;
+        document.querySelector('#bylineInfo').textContent = 'Visit the MousyLatest Store';
+        document.querySelector('#merchant-trust-info-card').textContent = 'MousyLatest Innovations Pvt Ltd';
+    }""")
+    page.wait_for_timeout(400)
+    assert page.locator('[data-az-feature="seller"]').inner_text().startswith("Sold by the brand: MousyLatest Innovations")
     assert page.locator(".az-chip-fee").all_inner_texts() == ["+₹59 delivery fee"] * 2
     # The middle column chip is on the same line as the big price.
     assert page.locator("#centerCol .apex-pricetopay-value + .az-chip-fee").count() == 1
@@ -106,9 +115,23 @@ def test_product_page_2026_layout(harness):
     # Clutter: Amazon's own ads, the bundle, the rails and the brand blocks go. The other tabs stay.
     for hidden in ("#desktop-dp-ilm_feature_div_0", "#heroQuickPromo_feature_div", "#sims-productBundle_feature_div_0",
                    "#sims-simsContainer_feature_div_0", "#sims-simsContainer_feature_div_1",
-                   "#aplusBrandStory_feature_div", ".btfSubNavDesktopFromTheBrandTab", "#brandSnapshot_feature_div"):
+                   "#aplusBrandStory_feature_div", ".btfSubNavDesktopFromTheBrandTab", "#brandSnapshot_feature_div",
+                   "#sp_detail_mousy"):
         assert not page.locator(hidden).is_visible(), hidden
     assert page.locator(".btfSubNavDesktopReviewsTab").is_visible()
+
+
+def test_rails_are_found_by_page_structure(harness):
+    """Rails with new names go too. The product content and the blocks with their own switch stay."""
+    page = harness.open("/dp/B0MOUSY020")
+    for hidden in ("#sims-simsContainer_feature_div_0", "#sims-sponsoredProducts2_feature_div_0",
+                   '#rhf [data-cel-widget="p13n-desktop-carousel_desktop-rhf_0"]',
+                   # These two have their own switches, which are on by default.
+                   "#sims-productBundle_feature_div_0", "#sims-discoveryAndInspiration_feature_div_0"):
+        assert not page.locator(hidden).is_visible(), hidden
+    for shown in ("#vsxoffers_feature_div", "#productDescription_feature_div", "#productDetails_feature_div",
+                  "#customer-reviews_feature_div"):
+        assert page.locator(shown).is_visible(), shown
 
 
 def test_clutter_switch_off_shows_the_block_again(harness):
@@ -133,6 +156,13 @@ def test_bank_offers_for_my_cards(harness):
     bank = page.locator("#az-bank .az-chip").all_inner_texts()
     assert any(text.startswith("Your card, HDFC Bank Debit Card: ₹75 cashback") for text in bank)
     assert not any("Mousy Bank" in text for text in bank)
+
+    # Case, spaces and dots do not matter: "MOUSYBANK" is "Mousy Bank".
+    popup.locator(".az-cards input").fill("MOUSYBANK")
+    popup.locator(".az-cards input").press("Enter")
+    page.wait_for_timeout(800)
+    bank = page.locator("#az-bank .az-chip").all_inner_texts()
+    assert any(text.startswith("Your card, Mousy Bank Credit Card") for text in bank)
 
 
 def test_minimal_ui_off_puts_buttons_in_buy_box(harness):
@@ -240,3 +270,30 @@ def test_cashback_tracks_items_added_during_session(harness):
     fee = cart.locator(".az-cart-fee")
     assert fee.count() == 1
     assert fee.inner_text().startswith("₹40 delivery")
+    # "Saved for later" is not in the cart. It is not in the counts or the list.
+    assert "of 2" in banner.inner_text()
+    assert "Ceramic Pour-Over" not in banner.locator(".az-cb-list").text_content()
+    # Re-check reads the session again. It shows that it ran.
+    banner.locator(".az-cb-recheck").click()
+    cart.wait_for_timeout(200)
+    assert cart.locator("#az-cashback .az-cb-recheck").inner_text() == "✓ Checked"
+    assert "1 tracked" in cart.locator("#az-cashback").inner_text()
+
+
+def test_cart_clips_coupon_with_hidden_collected_text(harness):
+    page = harness.open("/gp/cart/view.html")
+    # The click goes to the "Clip Coupon" link, not to the popover around it.
+    assert page.evaluate("window.mousySavedClips || 0") == 1
+    assert page.evaluate("window.mousyPopovers || 0") == 0
+
+
+def test_hidden_cart_panel_extends_cashback_banner(harness):
+    page = harness.open("/dp/B0MOUSY001?tag=mousy-21")
+    # Make the free space that Amazon keeps for the hidden cart panel.
+    # A new node starts a run, the same as when Amazon loads more of the page.
+    page.evaluate("document.body.style.paddingRight = '120px'; document.body.append(document.createElement('div'))")
+    page.wait_for_timeout(400)
+    assert page.locator("html").get_attribute("data-az-ewc") == "closed"
+    banner = page.locator("#az-cashback").bounding_box()
+    width = page.evaluate("document.documentElement.clientWidth")
+    assert abs(banner["x"] + banner["width"] - width) <= 1

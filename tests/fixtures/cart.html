@@ -30,6 +30,27 @@
                 </div>
             </div>
         </div>
+        <!-- "Saved for later" uses the same row markup. The cashback check must skip it. -->
+        <div id="sc-saved-cart">
+            <h2>Saved for later (1 item)</h2>
+            <div class="sc-list-item" data-asin="B0MOUSY003" data-itemtype="saved">
+                <div class="sc-product-title">Mousy Ceramic Pour-Over Dripper</div>
+                <!-- Amazon's real cart coupon box (2026-10). The "Coupon Collected" text is always there, but hidden. -->
+                <div class="a-box a-text-center sc-clipcoupon sc-clipcoupon-container" data-csa-c-painter="cart-coupon" data-feature-id="item-coupon-container"><div class="a-box-inner a-padding-mini">
+                    <span data-csa-c-type="item" data-csa-c-owner="PromotionsDiscovery">
+                        <span class="a-declarative" data-action="a-popover" onclick="window.mousyPopovers = (window.mousyPopovers || 0) + 1;">
+                            <div class="sc-coupon-wrapper" data-csa-c-action="clipPromotion">
+                                <div class="a-row sc-wrapper sc-hidden"><span class="a-size-mini a-color-success sc-clipped-msg">Coupon Collected</span></div>
+                                <a aria-label="Save 2%" href="#" role="button" class="a-popover-trigger a-declarative" onclick="return false;"><span class="a-size-small">Save 2%</span></a>
+                                <div class="a-row sc-wrapper">
+                                    <a data-feature-id="item-coupon-action" aria-label="Clip Coupon Save 2%" class="a-size-small a-link-normal sc-action-link" href="#" id="mousy-saved-clip" onclick="window.mousySavedClips = (window.mousySavedClips || 0) + 1; event.stopPropagation(); return false;">Clip Coupon</a>
+                                </div>
+                            </div>
+                        </span>
+                    </span>
+                </div></div>
+            </div>
+        </div>
         <div class="cart-side">
             <b>Subtotal (2 items): ₹1,148.00</b>
             <button class="buy-btn" type="button" style="background:#ffd814">Proceed to Buy</button>

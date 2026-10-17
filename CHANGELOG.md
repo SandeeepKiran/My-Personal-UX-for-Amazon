@@ -8,6 +8,34 @@ Each `## [x.y.z]` section is the text for the GitHub release with the tag `vx.y.
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-10-17
+
+### Added
+
+- **Re-check button** on the cashback banner, to the left of ✕. It reads the cashback
+  session and the cart again, and shows "✓ Checked" for 2 seconds.
+
+### Fixed
+
+- **Auto-collect coupons** now collects the "Clip Coupon" coupons on the cart page.
+  Amazon keeps a hidden "Coupon Collected" text in each box. The extension read it and
+  thought that the coupon was already collected. Now it reads only the visible text, and
+  it clicks the "Clip Coupon" link, not the popover around it.
+- **Hide recommendation rails** now finds rails by the page structure, not only by their
+  names. Thus, rails with new names also go, for example "Featured items to consider",
+  "Products related to this item" (sponsored) and "Best Sellers in ...". The product
+  description, product details, specifications and reviews stay.
+- **Support — Chat** in the account menu opens the support chat again. Amazon now gives
+  an error for `/message-us` without the `muClientName` and `paradigm` parameters.
+- **My cards** ignores spaces and dots as well as case: "amazonpay" matches "Amazon Pay".
+- **Seller badge**: a seller that is the brand's own company, for example
+  "Mousy Innovations Pvt Ltd" for the brand "Mousy", now shows as "Sold by the brand".
+  Resellers ("Mousy Traders") still show as third-party sellers.
+- **Cashback banner on the cart**: the tracked and untracked counts no longer include
+  "Saved for later" items.
+- **Hidden cart panel**: the cashback banner now fills the free space on the right,
+  the same as the top bar below it.
+
 ## [5.2.0] - 2026-10-17
 
 ### Added

@@ -20,7 +20,9 @@ var ACCOUNT_SECTIONS = [
         title: 'Customer Support',
         links: [
             ['Support — Center', '/hz/contact-us/'],
-            ['Support — Chat', '/message-us'],
+            // "/message-us" alone gives a 500 error. The chat needs these two parameters.
+            // The help hub uses the same link after its "Start chatting now" button (checked 2026-10-17).
+            ['Support — Chat', '/message-us?muClientName=foresight&paradigm=foresight'],
             ['Message Center — Seller', '/gp/message#!/inbox/bsm'],
         ],
     },

@@ -4,7 +4,7 @@
 It shows the fees that Amazon puts in small print. It also adds useful helpers, for
 example the price for each 100 g and a link to the price history.
 
-Version 5.2.0 · Chrome · Edge · Firefox · amazon.in and amazon.com
+Version 5.3.0 · Chrome · Edge · Firefox · amazon.in and amazon.com
 
 [![Watch the 22-second video](docs/media/promo-preview.gif)](docs/media/promo.mp4)
 

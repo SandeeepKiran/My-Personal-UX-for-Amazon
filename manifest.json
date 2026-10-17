@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Amazon - My Personal UX",
   "short_name": "My Personal UX",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "Cleans up Amazon: hides sponsored clutter, warns about extra fees, and adds unit prices, seller badges and price history.",
   "author": "Sandeep Kiran (Mousy)",
   "homepage_url": "https://github.com/SandeeepKiran/My-Personal-UX-for-Amazon",

@@ -82,7 +82,7 @@ Also read `docs/known-risks.md`: Amazon selectors, cashback logic, and safe test
 ## 4. Commands
 
 ```powershell
-python -m pytest tests -q                    # 16 tests, about 40 s
+python -m pytest tests -q                    # 20 tests, about 45 s
 python tools/build.py                        # dist/chrome, dist/edge, dist/firefox + zips
 npx web-ext lint --source-dir dist/firefox   # Firefox rules (run after the build)
 pwsh tools/media/promo/build_promo.ps1       # Video, poster, GIF and README images (about 8 min)

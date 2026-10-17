@@ -386,6 +386,10 @@ html[data-az-ewc="closed"] #nav-flyout-ewc { display: none !important; }
    navGutterPatch() in cart.js sets top, width, height and color. */
 #az-nav-patch { position: absolute !important; right: 0 !important; z-index: 2147481900 !important; pointer-events: none !important; }
 
+/* The cashback banner has the same free space on its right. Extend the banner into it.
+   The extra padding keeps the buttons in the same place. cart.js sets --az-ewc-gutter. */
+html[data-az-ewc="closed"] #az-cashback { margin-right: calc(-1 * var(--az-ewc-gutter, 0px)) !important; padding-right: calc(14px + var(--az-ewc-gutter, 0px)) !important; }
+
 /* ====================================================================
    7. Cashback watch
    ==================================================================== */

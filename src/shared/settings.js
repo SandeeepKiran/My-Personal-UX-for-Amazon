@@ -47,7 +47,7 @@ var AZ = (() => {
             id: 'declutter', icon: '🧹', title: 'Product page: clutter',
             toggles: [
                 ['stripUrgency', 'Remove urgency text', 'Hides "Only 3 left", "Order soon" and countdown timers.'],
-                ['hideCarousels', 'Hide recommendation rails', 'Hides "Customers also bought", "Related items bought by customers" and similar rails.'],
+                ['hideCarousels', 'Hide recommendation rails', 'Hides "Customers also bought", sponsored rails, "Best Sellers" and all other product rails below the product.'],
                 ['hideBoughtTogether', 'Hide "Frequently bought together"', 'Hides the bundle with the "Add all to Cart" button.'],
                 ['hideProductVideos', 'Hide the video rail', 'Hides the "Videos for this product" rail.'],
                 ['hideBrandCarousel', 'Hide the brand rail', 'Hides the "Brands in this category on Amazon" rail.'],

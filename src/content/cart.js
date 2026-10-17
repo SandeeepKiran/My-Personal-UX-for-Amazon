@@ -7,10 +7,16 @@ function onCartPage() { return /\/(cart|gp\/cart)/.test(location.pathname); }
 
 var CART_ITEM_SELECTOR = '[data-asin][data-itemtype], .sc-list-item[data-asin], div[data-asin].sc-list-item-content, [data-asin].a-row.sc-list-item';
 
+// "Saved for later" uses the same row markup as the cart. Those items are not in the order.
+var SAVED_FOR_LATER = '#sc-saved-cart, #sc-secondary-list, [data-name="Saved for later"], [data-itemtype="saved"]';
+
 function cartItems() {
     const items = [];
     const seen = new Set();
     for (const node of $$(CART_ITEM_SELECTOR)) {
+        if (node.closest(SAVED_FOR_LATER)) continue;
+        const itemType = node.getAttribute('data-itemtype');
+        if (itemType && itemType !== 'active') continue;
         const asin = node.getAttribute('data-asin');
         if (!asin || seen.has(asin)) continue;
         seen.add(asin);
@@ -139,15 +145,25 @@ defineFeature({
 
 // When the side panel is hidden, Amazon keeps its space on the right. Next to the dark
 // top bar, that space shows as a light strip. This patch paints over the strip.
+function setGutterWidth(width) {
+    const root = document.documentElement;
+    if (width) root.style.setProperty('--az-ewc-gutter', `${width}px`);
+    else root.style.removeProperty('--az-ewc-gutter');
+}
+
 function navGutterPatch(show) {
     const patch = $('#az-nav-patch');
     const belt = $('#nav-belt');
-    if (!show || !belt) { patch?.remove(); return; }
+    if (!show || !belt) { patch?.remove(); setGutterWidth(0); return; }
 
     let width = 0;
     for (const node of [$('#a-page'), document.body, belt]) {
         if (node) width = Math.max(width, parseFloat(getComputedStyle(node).paddingRight) || 0);
     }
+    // The cashback banner is a child of <body>, above the top bar. Its free space is the
+    // space between the body content and the window edge. content.css extends the banner into it.
+    const bodyRight = document.body.getBoundingClientRect().right - (parseFloat(getComputedStyle(document.body).paddingRight) || 0);
+    setGutterWidth(Math.max(0, Math.round(document.documentElement.clientWidth - bodyRight)));
     if (!width) { patch?.remove(); return; }
 
     // The cashback banner pushes the top bar down. Thus, measure the bar position each time.

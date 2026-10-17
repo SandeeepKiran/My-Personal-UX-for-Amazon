@@ -168,6 +168,11 @@ function cashbackBanner() {
         }));
     }
     actions.append(el('button', {
+        type: 'button', class: 'az-cb-recheck', text: '↻ Re-check',
+        title: 'Read the cashback session and the cart again',
+        onclick: recheckCashback,
+    }));
+    actions.append(el('button', {
         type: 'button', class: 'az-cb-close', text: '✕',
         'aria-label': 'Hide the cashback banner',
         title: 'Hide. To show it again, click the cashback pill (bottom right).',
@@ -183,6 +188,24 @@ function cashbackBanner() {
     document.body.prepend(el('div', { id: 'az-cashback', class: tone, 'data-state': state, 'data-az-feature': 'cashback' },
         el('span', { class: 'az-cb-msg', text: headline }),
         actions));
+}
+
+// Reads the session again from storage, then builds the banner again. The session can
+// expire while the page is open, and another tab or device can change the stored session.
+async function recheckCashback() {
+    try {
+        Object.assign(session, await ext.storage.local.get({ ...SESSION_DEFAULTS }));
+    } catch { /* Storage is not available. Check again with the values in memory. */ }
+    $('#az-cashback')?.remove();
+    cashbackBanner();
+    affiliateStatusPill();
+    renderAffiliateBox();
+    // Show that the check ran, also when the result did not change.
+    const button = $('#az-cashback .az-cb-recheck');
+    if (!button) return;
+    button.textContent = '✓ Checked';
+    button.title = `Checked at ${new Date().toLocaleTimeString()}`;
+    setTimeout(() => { if (button.isConnected) button.textContent = '↻ Re-check'; }, 2000);
 }
 
 // ---------- Pill ----------

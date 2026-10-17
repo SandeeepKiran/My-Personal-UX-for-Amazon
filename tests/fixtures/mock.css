@@ -76,3 +76,4 @@ body.no-ewc #nav-belt, body.no-ewc #nav-main { padding-right: 16px; }
 .sc-thumb { width: 120px; height: 120px; border-radius: 8px; background: #f7f4ef; display: flex; align-items: center; justify-content: center; font-size: 48px; flex: none; }
 .sc-product-title { font-size: 17px; }
 .sc-delivery { margin-top: 6px; color: #0f1111; }
+.sc-hidden { display: none; }
