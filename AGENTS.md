@@ -72,9 +72,10 @@ Also read `docs/known-risks.md`: Amazon selectors, cashback logic, and safe test
 - **India only.** A setting with `inOnly` set is off on amazon.com. Use `enabled(key)`, not
   `settings[key]`, to read a setting.
 - **Version.** The footer reads the version from `manifest.json`. When you change the
-  version, also change `README.md` (line 7), `tools/media/promo/stage.html` (outro text),
-  and add a section to `CHANGELOG.md`. Then make the media again (see below), because
-  the images show the footer.
+  version, also change `README.md` (line 7) and add a section to `CHANGELOG.md`.
+- **Media.** Do NOT remake the media on a version bump. Leave `tools/media/promo/stage.html`
+  and `docs/media/` unchanged and do not run `build_promo.ps1`, unless Sandeep asks for new
+  media. Why: media is a separate, deliberate job, and the current media is approved.
 - **Changelog.** Add each change under `## [Unreleased]` in `CHANGELOG.md`. At release
   time, change that heading to `## [x.y.z] - YYYY-MM-DD`. Use the groups Added, Changed,
   Removed, Fixed, Security.
